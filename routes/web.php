@@ -27,4 +27,8 @@ Route::post('/follow/{user}', 'FollowsController@store');
 //profile related routes
 Route::get('/profile/{user}', 'ProfileController@index')->name('profile.show');
 Route::get('/profile/{user}/edit', 'ProfileController@edit')->name('profile.edit');
-Route::patch('/profile/{user}', 'ProfileController@update')->name('profile.update');
+Route::post('/profile/{user}', 'ProfileController@update')->name('profile.update');
+
+//post related routes
+Route::post('/post', 'PostController@store')->name('post.store');
+Route::get('/post/{post}', 'PostController@show');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use App\Profile;
 use App\User;
@@ -30,11 +31,26 @@ class ProfileController extends Controller
     {
 	 	$data = $request->validate([
     		'biography' => 'required',
-    		'profession' => 'required'
+    		'profession' => 'required',
+            'image' => '',
     	]);
     	
-    	auth()->user()->profile->update($data);
+        if($request->image)
+        {
+            $imagePath = $request->image->store('profile', 'public');
 
-    	return view('profile.index', compact('user'));
+            $image = Image::make(public_path("storage/{$imagePath}"))->fit(1000, 1000);
+
+            $image->save();
+
+            $imgArr = ['image' => $imagePath];
+        }
+
+        // dd($imgArr);
+
+    	auth()->user()->profile->update(array_merge($data, $imgArr ?? []));
+
+    	// return view('profile.index', compact('user'));
+        return redirect(route('profile.show', $user));
     } 
 }
