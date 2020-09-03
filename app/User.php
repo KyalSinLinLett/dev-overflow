@@ -39,6 +39,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $touches = ['posts'];
+
     /*
     when user created, this will automatically fill the profile with default values.
     */
@@ -68,5 +70,15 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class)->orderBy('created_at', 'DESC');
+    }
+
+    public function liked_posts()
+    {
+        return $this->belongsToMany(Post::class)->orderBy('created_at', 'DESC');
+    }
+
+    public function shared_posts()
+    {
+        return $this->belongsToMany(Post::class, 'post_user_share');
     }
 }

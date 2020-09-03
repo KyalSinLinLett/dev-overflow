@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Profile;
 use App\User;
@@ -50,7 +51,36 @@ class ProfileController extends Controller
 
     	auth()->user()->profile->update(array_merge($data, $imgArr ?? []));
 
-    	// return view('profile.index', compact('user'));
         return redirect(route('profile.show', $user));
     } 
+
+    public function viewLikedPosts(User $user)
+    {
+        if ($user->id != auth()->user()->id)
+        {
+            return response()->json(['error' => 'Not authorized.'],403);
+        }
+
+        $posts = auth()->user()->liked_posts;
+        return view('post.likedPosts', compact('posts'));
+    }
+
+    public function sharedPosts(User $user)
+    {
+        $shared_posts = $user->shared_posts()->latest()->get();
+        
+        return view('post.sharedPosts', compact('shared_posts'));
+    }
+
+    public function followerList(User $user)
+    {
+        $followers = $user->profile->followers;
+        return view('profile.followerList', compact('followers'));
+    }
+
+    public function followingList(User $user)
+    {
+        $following = $user->following;
+        return view('profile.followingList', compact('following'));
+    }
 }

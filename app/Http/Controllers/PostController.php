@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use App\Post;
+use App\User;
 
 class PostController extends Controller
 {
@@ -33,7 +34,7 @@ class PostController extends Controller
    		{
    			$imagePath = $request->postimage->store('post', 'public');
 
-   			$image = Image::make(public_path("storage/{$imagePath}"))->fit(800, 800);
+   			$image = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 1200);
 
    			$image->save();
 
@@ -49,6 +50,75 @@ class PostController extends Controller
 
    	public function show(Post $post)
    	{
-   		return view('post.show', compact('post'));
+      $likes = (auth()->user()) ? auth()->user()->liked_posts->contains($post->id) : false;
+
+   		return view('post.show', compact('post', 'likes'));
    	}
+
+    public function feed(){
+      $posts = Post::latest()->get();
+      return view('welcome', compact('posts'));
+    }
+
+    public function edit(Post $post)
+    {
+      return view('post.edit', compact('post'));
+    }
+
+    public function update(Request $request, Post $post)
+    { 
+      $data = $request->validate([
+        'title' => 'required',
+        'content' => 'required',
+        'postimage' => '',
+      ]);
+
+      if ($request->postimage)
+      {
+        $imagePath = $request->postimage->store('post', 'public');
+
+        $image = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 1200);
+
+        $image->save();
+
+        $imgArr = ['postimage' => $imagePath];
+      }
+
+      Post::find($post->id)->update(array_merge($data, $imgArr ?? []));
+
+      return redirect(route('post.show', $post));
+    }
+
+    public function delete(Post $post)
+    {
+      $post->delete();
+      $user = $post->user;
+      // return view('profile.index', compact('user'));
+      return redirect(route('profile.show', $user));
+    }
+
+    public function sharePost(Request $request, Post $post)
+    {
+      auth()->user()->shared_posts()->attach($post);
+
+      return redirect()->back()->with(['message'=>"Post is added to your shared posts collection."]);
+    }
+
+    public function shareRemove(Post $post)
+    {
+      // removes the shared post
+      auth()->user()->shared_posts()->detach($post);
+
+      $user = auth()->user();
+
+      return redirect(route('profile.sharedPosts', $user));
+
+    }
+
+    public function privateFeed()
+    {
+      // dd(auth()->user());
+      // return view('post.my-circle', compact('posts'));
+    }
+
 }

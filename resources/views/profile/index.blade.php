@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-baseline mx-3 row border-bottom">
-        <h2>Profile of {{ $user->name }}</h2>
-
+    <div class="d-flex justify-content-between align-items-center mx-2">
+        <h1>Profile of {{ $user->name }}</h1>
         @can('update', $user->profile)
             <strong><a href="/profile/{{$user->id}}/edit">Edit profile</a></strong>
         @endcan
     </div>
+    <hr>
     
     <div class="row mt-4">
         <div class="col">
@@ -38,8 +38,8 @@
                                 </thead>
                                 <tbody>
                                     <tr style="text-align: center;">
-                                        <td>{{ $user->profile->followers->count() }}</td>
-                                        <td>{{ $user->following->count() }}</td>
+                                        <td><a href="{{ route('profile.followerList', $user) }}">{{ $user->profile->followers->count() }}</a></td>
+                                        <td><a href="{{ route('profile.followingList', $user) }}">{{ $user->following->count() }}</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -57,8 +57,21 @@
                             </div>
                         </div>
                         <!-- /buttons -->
-                    </div>
+
+                        @can('view', $user->profile)
+                        <div style="text-align: center;">
+                            <a href="{{ route('profile.likedPosts', $user) }}">See liked posts</a>
+                        </div>
+                        @endcan
+                        <div>
+                            <a href="{{ route('profile.sharedPosts', $user) }}">View {{ $user->name }}'s Shared Posts</a>
+                        </div>
+                    </div> 
                 </div>
+
+                
+
+
             </div>
         </div>
     </div>
@@ -138,18 +151,28 @@
             <div class="card p-4 mb-3"style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 
                 <div class="row">
-                    <div class="col d-flex">
+                    <div class="col d-flex align-items-center">
                         <img src="{{ $user->profile->profileImage() }}" class="rounded-circle" width="50" height="50">
-                        <h4 class="mt-3 ml-3" >
-                            <strong>{{ $user->name }}</strong>
-                        </h4>
+                        <div>
+                            <strong style="font-size: 25px; border-right: 1px solid; padding-right: 15px" class="mt-3 ml-3">{{ $user->name }}</strong>
+                        </div>
+                        <div>
+                            <strong class="ml-3">{{ $post->liked_by->count() }}  
+                                <?php 
+                                    $like = "like";
+                                    if ($post->liked_by->count() > 1){
+                                        $like = "likes";
+                                    }?>
+                                    {{$like}}
+                            </strong>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col">
                         <div class="mt-3">
-                            <h4>{{ $post->title }}</h4>                    
+                            <a href="{{ route('post.show', $post) }}"><h4>{{ $post->title }}</h4></a>
                         </div>
                         <div>
                             <article>
@@ -168,6 +191,12 @@
 
                             
                         </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <like-component id="{{ $post->id }}" likes="{{ auth()->user()->liked_posts->contains($post->id) ?? false }}"></like-component>
                     </div>
                 </div>
             </div>
