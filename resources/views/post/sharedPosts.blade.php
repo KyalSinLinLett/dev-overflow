@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
 	<div>
-		<h2>Shared Posts</h2>
+		<h2>{{ $user->name }}'s shared Posts</h2>
 	</div>
 	<hr>
 
@@ -43,7 +43,7 @@
 	            </div>
 
 	            <div>
-	            	@auth
+	            	@if(auth()->user()->shared_posts->contains($post))
 	            	    <strong><a href="{{ route('post.shareremove', $post) }}">Remove</a></strong>
 	            	@endauth
 	            </div>

@@ -50,6 +50,17 @@
                             @endif
                         @else
                             <?php $user = auth()->user(); ?>
+                            <li class="nav-item dropdown"> 
+                                <!-- Dropdown -->
+                                  <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    Groups
+                                  </a>
+                                  <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{{ route('group.index') }}">Groups I've created</a>
+                                    <a class="dropdown-item" href="{{ route('group.joined') }}">Groups I've joined</a>
+                                  </div>
+                                </li>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('post.privatefeed') }}">My Circle</a>
                             </li>

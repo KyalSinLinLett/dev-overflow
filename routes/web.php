@@ -48,9 +48,22 @@ Route::get('/post/{post}', 'PostController@show')->name('post.show');
 Route::get('/post/{post}/edit', 'PostController@edit')->name('post.edit');
 Route::post('/post/{post}', 'PostController@update')->name('post.update');
 Route::get('/post/{post}/delete', 'PostController@delete')->name('post.delete');
-Route::get('/post/my-circle', 'PostController@privateFeed')->name('post.privatefeed');
+Route::get('/my-circle', 'PostController@privateFeed')->name('post.privatefeed');
 
 //sharing posts related
 Route::get('/post/{post}/share', 'PostController@sharePost')->name('post.share');
 Route::get('/post/{post}/share-remove', 'PostController@shareRemove')->name('post.shareremove');
+
+//group related routes
+Route::get('/group', 'GroupController@index')->name('group.index');
+Route::get('/group/joined-groups', 'GroupController@joined_groups')->name('group.joined');
+Route::post('/group/create', 'GroupController@create')->name('group.create');
+Route::get('/group/join', 'GroupController@join')->name('group.join');
+Route::get('/group/home/{group}', 'GroupController@home')->name('group.home');
+Route::get('/group/edit/{group}', 'GroupController@edit')->name('group.edit');
+Route::post('/group/update/{group}', 'GroupController@update')->name('group.update');
+Route::get('/group/admin/post-panel/{group}', 'GroupController@post_panel')->name('group.post-panel');
+Route::get('/group/admin/member-panel/{group}', 'GroupController@member_panel')->name('group.member-panel');
+Route::get('/group/admin/make-admin/{member}/{group}', 'GroupController@make_admin')->name('group.makeadmin');
+Route::get('/group/admin/remove-member/{member}/{group}', 'GroupController@remove_member')->name('group.remove-member');
 

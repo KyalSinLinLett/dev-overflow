@@ -14,13 +14,13 @@ class PostController extends Controller
     	$this->middleware('auth');
     }
 
-   	public function index()
-   	{
-   		$users = auth()->user()->following()->pluck('profiles.user_id');
-   		$posts = Post::whereIn('user_id', $users)->with('user')->latest();
+   	// public function index()
+   	// {
+   	// 	// $users = auth()->user()->following()->pluck('profiles.user_id');
+   	// 	// $posts = Post::whereIn('user_id', $users)->with('user')->latest();
 
-   		return redirect(route('post.index', $posts));
-   	}
+   	// 	// return redirect(route('post.index', $posts));
+   	// }
 
    	public function store(Request $request)
    	{
@@ -117,8 +117,11 @@ class PostController extends Controller
 
     public function privateFeed()
     {
-      // dd(auth()->user());
-      // return view('post.my-circle', compact('posts'));
+      $users = auth()->user()->following()->pluck('profiles.user_id');
+
+      $posts = Post::whereIn('user_id', $users)->latest()->get();
+
+      return view('post.mycircle', compact('posts'));
     }
 
 }

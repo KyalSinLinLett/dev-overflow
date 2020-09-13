@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\User;
+use App\Post;
+use App\Group;
 
 class Profile extends Model
 {
@@ -25,4 +27,15 @@ class Profile extends Model
     {
     	return $this->belongsToMany(User::class);
     }
+
+    public function groups() // returns groups where the profile user is admin, sorry for the poor naming 
+    {
+        return $this->belongsToMany(Group::class, 'admin_group', 'profile_id', 'group_id');
+    }
+
+    public function member_of_groups()
+    {
+        return $this->belongsToMany(Group::class, 'member_group', 'profile_id', 'group_id');
+    }
+
 }

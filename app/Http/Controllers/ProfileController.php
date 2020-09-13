@@ -69,7 +69,7 @@ class ProfileController extends Controller
     {
         $shared_posts = $user->shared_posts()->latest()->get();
         
-        return view('post.sharedPosts', compact('shared_posts'));
+        return view('post.sharedPosts', compact('shared_posts', 'user'));
     }
 
     public function followerList(User $user)

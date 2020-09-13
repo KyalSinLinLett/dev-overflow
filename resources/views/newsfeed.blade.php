@@ -2,7 +2,7 @@
 	<h1>Public feed</h1>
 </div>
 <hr>
-@foreach($posts as $post)
+@forelse($posts as $post)
 <div class="card p-4 mb-3"style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 
     <div class="row">
@@ -63,4 +63,6 @@
         </div>
     </div>
 </div>
-@endforeach
+@empty
+    Such empty...
+@endforelse

@@ -1,0 +1,20 @@
+groups
+
+-name
+-purpose/genre
+-members
+-admins
+-posts - images, files, texts
+
+Admin - User
+- ask to join
+- post things in group specifically(wont be public, only seen by group members)
+- leave group
+- invite to join
+
+Creator of group will be admin. Admin can choose other members to become admin.
+only the creator can delete the group.
+creator cannot leave any group.
+
+Admin page - will show admin page if user is admin
+User page
