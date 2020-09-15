@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
+use App\User;
 use App\Group;
 use App\Profile;
 
@@ -95,11 +97,34 @@ class GroupController extends Controller
 		return view('group.member-panel', compact('group'));
 	}
 
+	public function admin_panel(Group $group)
+	{
+		return view('group.admin-list', compact('group'));
+	}
+
 	public function joined_groups()
 	{
 		$groups = auth()->user()->profile->member_of_groups;
 
 		return view('group.joined', compact('groups'));
+	}
+
+	public function g_member_profile(User $user)
+	{
+		$profile = $user->profile;
+
+		$p_member = $profile->member_of_groups->where('privacy', 0);
+		
+		return view('group.view-member-groups', compact('p_member', 'user'));
+	}
+
+	public function g_create_profile(User $user)
+	{
+		$profile = $user->profile;
+
+		$p_admin = $profile->groups->where('privacy', 0);
+		
+		return view('group.view-groups', compact('p_admin', 'user'));
 	}
 
 	public function make_admin(Profile $member, Group $group)
@@ -114,6 +139,40 @@ class GroupController extends Controller
 	{
 		$group->member()->detach($member);
 		return redirect()->back();
+	}
+
+	public function remove_admin(Profile $admin, Group $group)
+	{
+		$group->admin()->detach($admin);
+		$group->member()->attach($admin);
+		return redirect()->back();
+	}
+
+	public function search_member(Request $request)
+	{
+
+		$users = DB::table('member_group')
+					->join('profiles', 'member_group.profile_id', '=', 'profiles.id')
+					->join('users', 'users.id', '=', 'profiles.user_id')
+					->where([
+		                    ['name', 'like', '%'. $request->search_query .'%'],
+		                    ['group_id', '=', $request->group_id],
+	                	])
+					->limit(20)
+					->get();
+
+		$data = array();
+
+		foreach ($users as $user) {
+			array_push($data, [
+				'name' => $user->name,
+				'profession' => $user->profession,
+				'image' => $user->image,
+				'profile_id' => $user->profile_id,
+			]);
+		}
+
+        return json_encode($data);
 	}
 
 }

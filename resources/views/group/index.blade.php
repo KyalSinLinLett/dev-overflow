@@ -43,13 +43,19 @@
 		<h3>Your groups</h3>
 		@forelse($groups as $group)
 			<div class="card">
-				<div class="card-header">
+				<div class="card-header d-flex align-items-center">
+					<img src="{{ $group->groupImage() }}" width="35" height="35">
 					<p>Group: <a href="{{ route('group.home', $group)}}">{{ $group->name }}</a></p>
 				</div>
 				<div class="card-body">
 					<p>Category: {{ $group->category }}</p>
 					<p>Privacy: {{ $group->privacy }}</p>
 					<p>Description: {{ $group->description }}</p>
+					<small>Admins: 
+						@foreach($group->admin as $admin)
+						{{ App\User::find($admin->user_id)->name }} | 
+						@endforeach
+					</small>
 				</div>
 			</div>
 			<br>

@@ -10,6 +10,8 @@ use App\Post;
 
 class User extends Authenticatable
 {
+    protected $table = "users";
+
     use Notifiable;
 
     /**

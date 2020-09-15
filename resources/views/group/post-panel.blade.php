@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- use ajax in the future to make it async -->
 @if($group->admin->contains(Auth::user()->profile))
 <div class="container">
 	<h2>{{ $group->name }}'s admin panel<h2>
@@ -13,6 +14,9 @@
 	  </li>
 	  <li class="nav-item">
 	    <a class="nav-link" href="{{ route('group.member-panel', $group) }}">Members</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="{{ route('group.admin-panel', $group) }}">Admins</a>
 	  </li>
 	</ul>
 </div>

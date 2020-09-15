@@ -62,8 +62,19 @@ Route::get('/group/join', 'GroupController@join')->name('group.join');
 Route::get('/group/home/{group}', 'GroupController@home')->name('group.home');
 Route::get('/group/edit/{group}', 'GroupController@edit')->name('group.edit');
 Route::post('/group/update/{group}', 'GroupController@update')->name('group.update');
+Route::get('/profile/member-groups/{user}', 'GroupController@g_member_profile')->name('profile.member-groups');
+Route::get('/profile/created-groups/{user}', 'GroupController@g_create_profile')->name('profile.create-groups');
+
+// -> group admin related routes
 Route::get('/group/admin/post-panel/{group}', 'GroupController@post_panel')->name('group.post-panel');
 Route::get('/group/admin/member-panel/{group}', 'GroupController@member_panel')->name('group.member-panel');
+Route::get('/group/admin/admin-panel/{group}', 'GroupController@admin_panel')->name('group.admin-panel');
 Route::get('/group/admin/make-admin/{member}/{group}', 'GroupController@make_admin')->name('group.makeadmin');
 Route::get('/group/admin/remove-member/{member}/{group}', 'GroupController@remove_member')->name('group.remove-member');
+Route::get('/group/admin/remove-admin/{admin}/{group}', 'GroupController@remove_admin')->name('group.remove-admin');
+// -> group search member to add
+Route::get('/group/member/search', 'GroupController@search_member')->name('group.member-search');
+
+
+
 

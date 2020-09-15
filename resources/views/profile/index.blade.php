@@ -66,12 +66,11 @@
                         <div>
                             <a href="{{ route('profile.sharedPosts', $user) }}">View {{ $user->name }}'s Shared Posts</a>
                         </div>
+                        <div>
+                            <a href="{{ route('profile.member-groups', $user) }}">View {{ $user->name }}'s groups</a>
+                        </div>
                     </div> 
                 </div>
-
-                
-
-
             </div>
         </div>
     </div>

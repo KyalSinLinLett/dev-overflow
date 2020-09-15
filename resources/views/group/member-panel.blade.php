@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- use ajax in the future to make it async -->
 <div class="container">
 	@if($group->admin->contains(Auth::user()->profile))
 	<h2>{{ $group->name }}'s admin panel<h2>
@@ -15,6 +16,9 @@
 		  <li class="nav-item">
 		    <a class="nav-link active" href="{{ route('group.member-panel', $group) }}">Members</a>
 		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="{{ route('group.admin-panel', $group) }}">Admins</a>
+		  </li>
 		</ul>
 	</div>
 	<hr>
@@ -22,6 +26,12 @@
 	<!-- Refactor this -->
 	<h3>Members</h3>
 	<hr>
+	<div class="d-flex">
+		<input type="text" id="search-member" name="{{ $group->id }}" class="form-control" placeholder="Enter a member's name to search them">
+		<button class="btn btn-warning" id="clearbtn">Clear results</button>
+	</div>
+	
+	<br>
 	<div>
 	    <table class="table">
 	      <thead class="thead-dark">
@@ -31,14 +41,14 @@
 	          <th>Actions</th>
 	        </tr>
 	      </thead>
-	      <tbody>
+	      <tbody id="dyn-row">
 	      	@forelse ($group->member as $member)
 	        <tr>
 	          <td class="d-flex align-items-center"><img src="{{ $member->profileImage() }}" width="35" height="35" style="border-radius: 50%;"><a href="{{ route('profile.show', $member->user) }}"><strong class="ml-3">{{ $member->user->name }}</strong></a></td>
 	          <td>{{ $member->profession }}</td>
 	          <td>
-	          	<a href="{{ route('group.makeadmin', [$member, $group]) }}">Make admin</a> | 
-	            <a href="{{ route('group.remove-member', [$member, $group]) }}">Remove member</a>
+	          	<a onclick="return confirm('Are you sure you want to make this member an admin?');"href="{{ route('group.makeadmin', [$member, $group]) }}">Make admin</a> | 
+	            <a onclick="return confirm('Are you sure you want to remove this member?');"href="{{ route('group.remove-member', [$member, $group]) }}">Remove member</a>
 	          </td>
 	        </tr>
 	        @empty
@@ -56,6 +66,5 @@
 	
 
 </div>
-
 @endif
 @endsection

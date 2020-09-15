@@ -49859,6 +49859,8 @@ module.exports = function(module) {
  */
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
+__webpack_require__(/*! ./search */ "./resources/js/search.js");
+
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /**
  * The following block of code may be used to automatically register your
@@ -50134,6 +50136,46 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MessageComponent_vue_vue_type_template_id_0fbf33ae___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/search.js":
+/*!********************************!*\
+  !*** ./resources/js/search.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+{
+  $('body').on('keyup', '#search-member', function () {
+    var search_query = $(this).val();
+    var group_id = $(this).attr("name"); // console.log(search_query);
+
+    $.ajax({
+      method: 'get',
+      url: '/group/member/search',
+      dataType: 'json',
+      data: {
+        '_token': '{{ csrf_token() }}',
+        search_query: search_query,
+        group_id: group_id
+      },
+      success: function success(res) {
+        var tableRow = '';
+        $('#dyn-row').html('');
+        $.each(res, function (index, value) {
+          tableRow = '<tr><td>' + value.name + '</td><td>' + value.profession + '</td></tr>';
+          $('#dyn-row').append(tableRow);
+        });
+      }
+    });
+  });
+  $(document).ready(function () {
+    $("#clearbtn").click(function () {
+      location.reload();
+    });
+  });
+}
 
 /***/ }),
 
