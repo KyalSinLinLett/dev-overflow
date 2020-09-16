@@ -28,7 +28,7 @@
 	<hr>
 	<div class="d-flex">
 		<input type="text" id="search-member" name="{{ $group->id }}" class="form-control" placeholder="Enter a member's name to search them">
-		<button class="btn btn-warning" id="clearbtn">Clear results</button>
+		<button class="btn btn-warning" id="clearbtn">Clear</button>
 	</div>
 	
 	<br>
@@ -47,8 +47,8 @@
 	          <td class="d-flex align-items-center"><img src="{{ $member->profileImage() }}" width="35" height="35" style="border-radius: 50%;"><a href="{{ route('profile.show', $member->user) }}"><strong class="ml-3">{{ $member->user->name }}</strong></a></td>
 	          <td>{{ $member->profession }}</td>
 	          <td>
-	          	<a onclick="return confirm('Are you sure you want to make this member an admin?');"href="{{ route('group.makeadmin', [$member, $group]) }}">Make admin</a> | 
-	            <a onclick="return confirm('Are you sure you want to remove this member?');"href="{{ route('group.remove-member', [$member, $group]) }}">Remove member</a>
+	          	<a onclick="return confirm('Are you sure you want to make this member an admin?');" href="{{ route('group.makeadmin', [$member, $group]) }}">Make admin</a> | 
+	            <a onclick="return confirm('Are you sure you want to remove this member?');" href="{{ route('group.remove-member', [$member, $group]) }}">Remove member</a>
 	          </td>
 	        </tr>
 	        @empty

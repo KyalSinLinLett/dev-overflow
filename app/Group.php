@@ -3,11 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use App\Profile;
 use App\Post;
 
 class Group extends Model
 {
+    use Notifiable;
+
     protected $guarded = [];
 
     public function groupImage()

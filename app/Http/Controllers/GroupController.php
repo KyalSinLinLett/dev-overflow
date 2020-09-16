@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
+use App\Notifications\group_join_request;
 use App\User;
 use App\Group;
 use App\Profile;
@@ -169,10 +170,22 @@ class GroupController extends Controller
 				'profession' => $user->profession,
 				'image' => $user->image,
 				'profile_id' => $user->profile_id,
+				'user_id' => $user->user_id,
+				'group_id' => $user->group_id
 			]);
 		}
 
         return json_encode($data);
+	}
+
+	public function send_join_notification(User $user, Group $group)
+	{
+		$group->notify(new group_join_request($user));
+
+		// will insert a flag where $user sends a join request to a $group
+		DB::table('group_notification_flag')->insert(['group_id' => $group->id, 'user_id' => $user->id, 'sent' => 1]);
+
+		return redirect()->back();
 	}
 
 }

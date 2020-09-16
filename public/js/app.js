@@ -50147,9 +50147,15 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports) {
 
 {
+  $(document).ready(function () {
+    $("#clearbtn").hide();
+  });
   $('body').on('keyup', '#search-member', function () {
     var search_query = $(this).val();
-    var group_id = $(this).attr("name"); // console.log(search_query);
+    var group_id = $(this).attr("name");
+    $(document).ready(function () {
+      $("#clearbtn").show();
+    }); // console.log(search_query);
 
     $.ajax({
       method: 'get',
@@ -50164,7 +50170,7 @@ __webpack_require__.r(__webpack_exports__);
         var tableRow = '';
         $('#dyn-row').html('');
         $.each(res, function (index, value) {
-          tableRow = '<tr><td>' + value.name + '</td><td>' + value.profession + '</td></tr>';
+          tableRow = '<tr><td class="d-flex align-items-center"><a href="/profile/' + value.user_id + '"><strong class="ml-3">' + value.name + '</strong></a></td><td>' + value.profession + '</td><td><a onclick="return confirm(`Are you sure you want to make this member an admin?`);" href="/group/admin/make-admin/' + value.profile_id + '/' + value.group_id + '">Make admin</a> | <a onclick="return confirm(`Are you sure you want to remove this member?`);" href="/group/admin/remove-member/' + value.profile_id + '/' + value.group_id + '">Remove member</a></td></tr>';
           $('#dyn-row').append(tableRow);
         });
       }

@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+//temp
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -76,5 +80,8 @@ Route::get('/group/admin/remove-admin/{admin}/{group}', 'GroupController@remove_
 Route::get('/group/member/search', 'GroupController@search_member')->name('group.member-search');
 
 
+
+// notifications related routes
+Route::get('/group/join-request/{user}/{group}', 'GroupController@send_join_notification')->name('group.join-notif');
 
 

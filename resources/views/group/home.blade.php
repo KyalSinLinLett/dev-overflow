@@ -3,6 +3,12 @@
 @section('content')
 <div class="container">
 
+		@if(session()->has('success'))
+			<div class="card px-4 py-4 bg-success text-light">
+				{{ session()->get('success') }}
+			</div>
+		@endif
+
 	    <div class="d-flex justify-content-between align-items-center mx-2">
 	        <h1>{{ $group->name }}'s home</h1>
 	        @if($group->admin->contains(Auth::user()->profile))
@@ -35,8 +41,26 @@
 	                                	@foreach($group->admin as $admin)
 	                                	{{ App\User::find($admin->user_id)->name }} | 
 	                                	@endforeach
-	                                </strong></li>
+ 	                                </strong></li>
 	                            </ul>
+
+	                            <div>
+	                            	@if(!$group->admin->contains(Auth::user()->profile) && !$group->member->contains(Auth::user()->profile))
+	                            		
+										<?php
+
+										$sent = (DB::table('group_notification_flag')->where([['group_id', '=', $group->id], ['user_id', '=', Auth::id()]])->value('sent')) ? true : false;
+
+										?>
+
+	                            		@if(!$sent)
+	                            			<?php $user = Auth::user(); ?>
+	                            			<a href="{{ route('group.join-notif', [$user, $group]) }}">Send join request</a>
+	                        			@else
+	                        				<a href="#">cancel request</a>
+	                        			@endif
+	                            	@endif
+	                            </div>
 	                        </div>
 	                    </div> 
 	                </div>
