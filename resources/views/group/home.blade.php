@@ -12,7 +12,13 @@
 	    <div class="d-flex justify-content-between align-items-center mx-2">
 	        <h1>{{ $group->name }}'s home</h1>
 	        @if($group->admin->contains(Auth::user()->profile))
-	        <a href="{{ route('group.post-panel', $group) }}">Enter admin panel</a>	
+	        <a href="{{ route('group.post-panel', $group) }}">
+	        	@if( $group->unreadNotifications()->get()->count() > 0 )
+					<small class="text-light px-1" style="background-color: red; border-radius: 50%;"><strong>{{ $group->unreadNotifications()->get()->count() }}</strong></small>
+				@endif 
+
+				Enter admin panel
+			</a>	
 	        @endif    
 	    </div>
 	    <hr>
@@ -53,12 +59,31 @@
 
 										?>
 
-	                            		@if(!$sent)
-	                            			<?php $user = Auth::user(); ?>
+										<?php $user = Auth::user(); ?>   										
+	                            		@if(!$sent)	  
 	                            			<a href="{{ route('group.join-notif', [$user, $group]) }}">Send join request</a>
 	                        			@else
-	                        				<a href="#">cancel request</a>
+	                        				<a href="{{ route('group.cancel-request', [$user, $group]) }}">cancel request</a>
+	                        				<small>Your request will be reviewed by the admins shortly...</small>
 	                        			@endif
+	                        		@else
+	                        			<strong>Welcome back, {{ Auth::user()->name }}!</strong>
+
+	                        			@if(!$group->privacy)
+	                        				<a href="{{ route('group.invite-public', $group) }}">Invite your friends</a>	
+	                        			@endif
+
+
+
+
+
+
+
+
+
+
+
+
 	                            	@endif
 	                            </div>
 	                        </div>

@@ -45,7 +45,11 @@
 			<div class="card">
 				<div class="card-header d-flex align-items-center">
 					<img src="{{ $group->groupImage() }}" width="35" height="35">
-					<p>Group: <a href="{{ route('group.home', $group)}}">{{ $group->name }}</a></p>
+					<p>Group: <a href="{{ route('group.home', $group)}}">{{ $group->name }}</a> 
+
+						@if( $group->unreadNotifications()->get()->count() > 0 )
+							<small class="text-light px-1" style="background-color: red; border-radius: 50%;"><strong>{{ $group->unreadNotifications()->get()->count() }}</strong></small>
+						@endif
 				</div>
 				<div class="card-body">
 					<p>Category: {{ $group->category }}</p>

@@ -2,10 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-//temp
-
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -76,12 +72,20 @@ Route::get('/group/admin/admin-panel/{group}', 'GroupController@admin_panel')->n
 Route::get('/group/admin/make-admin/{member}/{group}', 'GroupController@make_admin')->name('group.makeadmin');
 Route::get('/group/admin/remove-member/{member}/{group}', 'GroupController@remove_member')->name('group.remove-member');
 Route::get('/group/admin/remove-admin/{admin}/{group}', 'GroupController@remove_admin')->name('group.remove-admin');
+Route::get('/group/admin/approve-request/{group}/{user}/{notif}', 'GroupController@approve_request')->name('group.approve-request');
+
 // -> group search member to add
 Route::get('/group/member/search', 'GroupController@search_member')->name('group.member-search');
 
-
-
-// notifications related routes
+// -> group notifications related routes
 Route::get('/group/join-request/{user}/{group}', 'GroupController@send_join_notification')->name('group.join-notif');
+Route::get('/group/admin/request-panel/{group}', 'GroupController@join_requests')->name('group.requests-panel');
+Route::get('/group/admin/cancel-request/{user}/{group}', 'GroupController@cancel_request')->name('group.cancel-request');
+Route::get('/group/approved-noti', 'GroupController@noti')->name('group.noti');
+Route::get('/group/mar/{notif}', 'GroupController@mark_as_read')->name('group.noti-mar');
+Route::get('/group/rmv/{notif}', 'GroupController@remove_noti')->name('group.noti-rmv');
 
-
+// -> group invite related routes
+Route::get('/group/invite-public/{group}', 'GroupController@invite_public')->name('group.invite-public');
+Route::get('/group/inv-pub/search', 'GroupController@public_invite_search');
+Route::get('/grp/send-inv/pub/{sender}/{recipient}/{group}', 'GroupController@send_pub_invite_noti');

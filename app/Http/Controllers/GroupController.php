@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Notifications\Notification;
 use Intervention\Image\Facades\Image;
 use App\Notifications\group_join_request;
+use App\Notifications\join_request_approved;
+use App\Notifications\send_pub_invite_noti;
 use App\User;
 use App\Group;
 use App\Profile;
@@ -186,6 +189,116 @@ class GroupController extends Controller
 		DB::table('group_notification_flag')->insert(['group_id' => $group->id, 'user_id' => $user->id, 'sent' => 1]);
 
 		return redirect()->back();
+	}
+
+	public function join_requests(Group $group)
+	{
+		return view('group.requests-panel', compact('group'));
+	}
+
+	public function approve_request(Group $group, User $user, $notif)
+	{
+		$group->member()->attach($user->profile);
+
+		$group->notifications()->where('id', $notif)->delete();
+
+		DB::table('group_notification_flag')->where(['group_id' => $group->id, 'user_id' => $user->id])->delete();
+
+		//send notif to $user that their membership is approved
+		$user->notify(new join_request_approved($user, $group));
+
+		return redirect()->back();
+	}
+
+	public function cancel_request(User $user, Group $group)
+	{
+		$group->notifications()->where([['notifiable_id', '=', $group->id], ['data', '=', json_encode(['user'=>$user])]])->delete();
+
+		DB::table('group_notification_flag')->where(['group_id' => $group->id, 'user_id' => $user->id])->delete();
+
+		return redirect()->back();
+	}
+
+	public function noti() 
+	{ 
+		$join_request = Auth::user()->notifications()->where('type', "App\Notifications\join_request_approved")->get();
+		
+		$pub_inv = Auth::user()->notifications()->where('type', "App\Notifications\send_pub_invite_noti")->get();
+		
+		$notifications = $join_request->merge($pub_inv);
+
+		return view('group.notifications', compact('notifications')); 
+	}
+
+	public function mark_as_read($notif)
+	{
+		Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+		
+		return redirect()->back();
+	}
+
+	public function remove_noti($notif)
+	{
+		$noti = Auth::user()->notifications()->where('id', $notif)->get();
+
+		dd($noti);
+
+		Auth::user()->notifications()->where('id', $notif)->delete();
+
+		if ($noti->type == 'App\Notifications\send_pub_invite_noti')
+		{
+			DB::table('public_invite_sent_flag')->where([['sender_id', '=', $noti->data['sender']], ['recipient_id', '=', $noti->data['recipient']], ['group_id', '=', $noti->data['group']]])->delete();	
+		}
+
+		return redirect()->back();
+	}
+
+	public function invite_public(Group $group)
+	{	
+		return view('group.public-invite', compact('group'));
+	}
+
+	public function public_invite_search(Request $request)
+	{
+		// public group invites can only be sent to the users follower
+		$followers = Auth::user()->profile->followers()->where('name', 'like', '%' . $request->search_query . '%')->get();
+
+		$data = array();
+
+		$group = Group::find($request->group_id);
+
+		foreach($followers as $follower)
+		{
+			$sent = (DB::table('public_invite_sent_flag')->where([['sender_id', '=', Auth::id()], ['recipient_id', '=', $follower->id], ['group_id', '=', $request->group_id]])->value('sent')) ? true : false;
+
+			// demorgan is your buddy!
+			if(!($group->member->contains($follower->profile) || $group->admin->contains($follower->profile)))
+			{
+				array_push($data, [
+					'recipient_uid' => $follower->id,
+					'recipient_name' => $follower->name,
+					'recipient_pi' => $follower->profile->profileImage(),
+					'sender_uid' => Auth::id(),
+					'group_id' => $request->group_id,
+					'sent' => $sent,
+				]);
+			}
+		}
+
+		
+
+
+		return json_encode($data);
+	}
+
+	public function send_pub_invite_noti(User $sender, User $recipient, Group $group)
+	{
+		$recipient->notify(new send_pub_invite_noti($sender, $recipient, $group));
+
+		// will insert a flag where $sender send an invite to a $recipient to join $group
+		DB::table('public_invite_sent_flag')->insert(['sender_id' => $sender->id, 'recipient_id' => $recipient->id, 'group_id' => $group->id, 'sent' => 1]);
+
+		return redirect()->back()->with('success', 'Invite has been sent to '.$recipient->name);
 	}
 
 }
