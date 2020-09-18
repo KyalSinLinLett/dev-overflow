@@ -10,6 +10,7 @@ use Intervention\Image\Facades\Image;
 use App\Notifications\group_join_request;
 use App\Notifications\join_request_approved;
 use App\Notifications\send_pub_invite_noti;
+use App\Notifications\send_priv_invite_noti;
 use App\User;
 use App\Group;
 use App\Profile;
@@ -60,15 +61,12 @@ class GroupController extends Controller
 
 	public function update(Request $request, Group $group)
 	{
-		// dd($request->name . $request->description . $request->image);
 
 		$data = $request->validate([
     		'name' => 'required|max:255',
     		'description' => 'required|max:255',
             'groupPhoto' => '',
     	]);
-
-    	// dd($data);
     	
         if($request->groupPhoto)
         {
@@ -141,7 +139,7 @@ class GroupController extends Controller
 
 	public function remove_member(Profile $member, Group $group)
 	{
-		$group->member()->detach($member);
+		$group->member()->detach($member);	
 		return redirect()->back();
 	}
 
@@ -224,8 +222,10 @@ class GroupController extends Controller
 		$join_request = Auth::user()->notifications()->where('type', "App\Notifications\join_request_approved")->get();
 		
 		$pub_inv = Auth::user()->notifications()->where('type', "App\Notifications\send_pub_invite_noti")->get();
-		
-		$notifications = $join_request->merge($pub_inv);
+
+		$priv_inv = Auth::user()->notifications()->where('type', "App\Notifications\send_priv_invite_noti")->get();
+
+		$notifications = $join_request->merge($pub_inv)->merge($priv_inv);
 
 		return view('group.notifications', compact('notifications')); 
 	}
@@ -239,16 +239,14 @@ class GroupController extends Controller
 
 	public function remove_noti($notif)
 	{
-		$noti = Auth::user()->notifications()->where('id', $notif)->get();
+		$noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
 
-		dd($noti);
-
-		Auth::user()->notifications()->where('id', $notif)->delete();
-
-		if ($noti->type == 'App\Notifications\send_pub_invite_noti')
+		if ($noti[0]['type'] == 'App\Notifications\send_pub_invite_noti')
 		{
-			DB::table('public_invite_sent_flag')->where([['sender_id', '=', $noti->data['sender']], ['recipient_id', '=', $noti->data['recipient']], ['group_id', '=', $noti->data['group']]])->delete();	
+			DB::table('public_invite_sent_flag')->where([['sender_id', '=', $noti[0]['data']['sender']], ['recipient_id', '=', $noti[0]['data']['recipient']], ['group_id', '=', $noti[0]['data']['group']]])->delete();	
 		}
+	
+		Auth::user()->notifications()->where('id', $notif)->delete();
 
 		return redirect()->back();
 	}
@@ -285,8 +283,35 @@ class GroupController extends Controller
 			}
 		}
 
-		
+		return json_encode($data);
+	}
 
+	public function private_invite_search(Request $request)
+	{
+		// public group invites can only be sent to the users follower
+		$user = Auth::user()->where('name', 'like', '%' . $request->search_query . '%')->get();
+
+		$data = array();
+
+		$group = Group::find($request->group_id);
+
+		foreach($user as $user)
+		{
+			$sent = (DB::table('private_invite_sent_flag')->where([['sender_id', '=', Auth::id()], ['recipient_id', '=', $user->id], ['group_id', '=', $request->group_id]])->value('sent')) ? true : false;
+
+			// demorgan is your buddy!
+			if(!($group->member->contains($user->profile) || $group->admin->contains($user->profile)))
+			{
+				array_push($data, [
+					'recipient_uid' => $user->id,
+					'recipient_name' => $user->name,
+					'recipient_pi' => $user->profile->profileImage(),
+					'sender_uid' => Auth::id(),
+					'group_id' => $request->group_id,
+					'sent' => $sent,
+				]);
+			}
+		}
 
 		return json_encode($data);
 	}
@@ -300,5 +325,44 @@ class GroupController extends Controller
 
 		return redirect()->back()->with('success', 'Invite has been sent to '.$recipient->name);
 	}
+
+	public function send_priv_invite_noti(User $sender, User $recipient, Group $group)
+	{
+		$recipient->notify(new send_priv_invite_noti($sender, $recipient, $group));
+
+		// will insert a flag where $sender send an invite to a $recipient to join $group
+		DB::table('private_invite_sent_flag')->insert(['sender_id' => $sender->id, 'recipient_id' => $recipient->id, 'group_id' => $group->id, 'sent' => 1]);
+
+		return redirect()->back()->with('success', 'Invite has been sent to '.$recipient->name);
+	}
+
+	public function accept_invite($notif)
+	{
+		// once the invite is accepted, the notification is gone.
+
+		$noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
+
+		Group::find($noti[0]['data']['group'])->member()->attach(User::find($noti[0]['data']['recipient'])->profile);
+
+		DB::table('private_invite_sent_flag')->where([['sender_id', '=', $noti[0]['data']['sender']], ['recipient_id', '=', $noti[0]['data']['recipient']], ['group_id', '=', $noti[0]['data']['group']]])->delete();	
+
+		Auth::user()->notifications()->where('id', $notif)->delete();
+
+		return redirect()->back();
+
+		// send a accepted notifications back
+	}
+
+	//////////// group posts related methods ////////////////
+
+	// public function p_create(Request $request)
+	// {
+	// 	$data = $request->validate([
+    //    		'content' => 'required|max:255',
+    //            'attachment' => 'file|size:2000',
+    //    	]);
+	// }
+
+
 
 }

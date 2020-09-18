@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Profile;
 use App\Post;
+use App\GroupPosts;
 
 class Group extends Model
 {
@@ -30,8 +31,8 @@ class Group extends Model
     	return $this->belongsToMany(Profile::class, 'member_group', 'group_id', 'profile_id');
     }
 
-    public function posts()
+    public function group_posts()
     {
-    	return $this->hasMany(Post::class);
+    	return $this->hasMany(GroupPost::class);
     }
 }

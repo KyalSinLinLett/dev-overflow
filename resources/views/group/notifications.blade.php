@@ -14,17 +14,28 @@
 						<strong><a href="{{ route('profile.show', App\User::find($notif->data['user'])) }}">{{ App\User::find($notif->data['user'])->name }}</a>, your request to join <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}</a> has been approved.</strong>
 					@elseif($notif->type == 'App\Notifications\send_pub_invite_noti')
 						<strong><a href="{{ route('profile.show', App\User::find($notif->data['sender'])) }}">{{ App\User::find($notif->data['sender'])->name }}</a> invited you to join <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}.</a></strong>
+					@elseif($notif->type == 'App\Notifications\send_priv_invite_noti')
+						<strong><a href="{{ route('profile.show', App\User::find($notif->data['sender'])) }}">{{ App\User::find($notif->data['sender'])->name }}</a> invited you to join a private group, <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}.</a></strong>
 					@endif
 
-					<?php 
-						$read = ($notif->read_at != null) ? true : false; 
-					?>
-
-					@if(!$read)
-					<a href="{{ route('group.noti-mar', $notif) }}">Mark as read</a>
+					@if($notif->type == 'App\Notifications\send_priv_invite_noti' && !Auth::user()->profile->member_of_groups->contains(App\Group::find($notif->data['group'])))
+						<a href="{{ route('group.accept-invite-pri', $notif) }}">Accept invite</a>
+					
 					@else
-					<a href="{{ route('group.noti-rmv', $notif) }}">Remove</a>					
+						<?php 
+							$read = ($notif->read_at != null) ? true : false; 
+						?>
+
+						@if(!$read)
+						<a href="{{ route('group.noti-mar', $notif) }}">Mark as read</a>
+						@else
+						<a href="{{ route('group.noti-rmv', $notif) }}">Remove</a>					
+						@endif
+
 					@endif
+
+
+					
 				</div>
 			</div>
 		@empty

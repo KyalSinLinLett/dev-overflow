@@ -25,7 +25,7 @@
 	    
 	    <div class="row mt-4">
 	        <div class="col">
-	            <div class="card p-2" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+	            <div class="card p-2 mb-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 	                <div class="row p-2 align-items-center">
 	                    <div class="col">
 	                        <div class="mt-4" style="text-align: center;">
@@ -51,7 +51,7 @@
 	                            </ul>
 
 	                            <div>
-	                            	@if(!$group->admin->contains(Auth::user()->profile) && !$group->member->contains(Auth::user()->profile))
+	                            	@if(!$group->privacy && !$group->admin->contains(Auth::user()->profile) && !$group->member->contains(Auth::user()->profile))
 	                            		
 										<?php
 
@@ -67,22 +67,10 @@
 	                        				<small>Your request will be reviewed by the admins shortly...</small>
 	                        			@endif
 	                        		@else
-	                        			<strong>Welcome back, {{ Auth::user()->name }}!</strong>
-
 	                        			@if(!$group->privacy)
+	                        				<strong>Welcome back, {{ Auth::user()->name }}!</strong>
 	                        				<a href="{{ route('group.invite-public', $group) }}">Invite your friends</a>	
 	                        			@endif
-
-
-
-
-
-
-
-
-
-
-
 
 	                            	@endif
 	                            </div>
@@ -90,8 +78,39 @@
 	                    </div> 
 	                </div>
 	            </div>
+		@if(!$group->privacy || $group->admin->contains(Auth::user()->profile) || $group->member->contains(Auth::user()->profile))
+            <div class="card" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+            	<div class="card-header bg-dark text-light" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+            		Share something to the group
+            	</div>	
+            	<div class="card-body">
+            		<form action="{{ route('group.create-post') }}" method="post" class="form-group" enctype="multipart/form-data">
+            			@csrf
+            			<textarea name="content" class="form-control mb-3" cols="50" rows="5" required></textarea> 
+            			<input type="file" accept="image/*, application/png, application/pdf, */docx" name="attachment" class="mb-3">
+            			<input type="submit" name="submit" class="btn btn-info" value="Post">
+            		</form>
+            	</div>
+            </div>
+            <hr>
+
+            <h2>
+            	Group posts
+            </h2>
+            <hr>
+
+            <!-- foreach -->
+            <div class="card">
+            	a group post
+            </div>
+            
+	    @else
+	    	<div>
+	    		This is a private group. You must be invited by the admins to become a member.
+	    	</div>
+	    @endif
 	        </div>
 	    </div>
-
+	
 </div>
 @endsection('content')

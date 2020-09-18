@@ -1,9 +1,16 @@
-@extends('layouts.app')
+	@extends('layouts.app')
 
 @section('content')
 <!-- use ajax in the future to make it async -->
 <div class="container">
 	@if($group->admin->contains(Auth::user()->profile))
+	
+	@if(session()->has('success'))
+		<div class="card text-light bg-success px-4 py-3">
+			{{ session()->get('success') }}
+		</div>
+	@endif
+
 	<h2>{{ $group->name }}'s admin panel<h2>
 	<small>Manage group posts and members here.</small>
 	<small><a href="{{ route('group.home', $group) }}">Back to group</a></small>
@@ -34,14 +41,30 @@
 	</div>
 	<hr>
 
-	<!-- Refactor this -->
 	<h3>Admins</h3>
 	<hr>
+
+	<!-- Refactor this -->
+	<div>
+		<h5>Send invites to people to join your group</h5>		
+
+		<div class="d-flex">
+			<input type="text" id="search-user-private" name="{{ $group->id }}" class="form-control" placeholder="Enter a user's name to look for them">
+			<button class="btn btn-warning" id="clearbtn3">Clear</button>
+		</div>
+
+		<table class="table">
+			<tbody id="dyn-users-row-private">
+				<tr><td><div class="card px-4 py-2" style="border-radius: 2rem;">Type something in the search bar...</div></td></tr>
+			</tbody>
+		</table>
+	</div>
+
 	<div>
 	    <table class="table">
 	      <thead class="thead-dark">
 	        <tr>
-	          <th>Name</th>
+	          <th>Admin's name</th>
 	          <th>Profession</th>
 	          <th>Actions</th>
 	        </tr>
