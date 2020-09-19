@@ -33,6 +33,6 @@ class Group extends Model
 
     public function group_posts()
     {
-    	return $this->hasMany(GroupPost::class);
+    	return $this->hasMany(GroupPosts::class)->orderBy('created_at', 'DESC');;
     }
 }

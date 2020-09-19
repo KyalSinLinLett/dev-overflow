@@ -10,12 +10,16 @@ class GroupPosts extends Model
 {
 	use Notifiable;
 
-	protected $fillable = ['content', 'attachment'];
-
 	protected $guarded = [];
 
 	public function group()
 	{
 		return $this->belongsTo(Group::class);
 	}
+
+	// public function liked_by()
+
+	// public function comments()
+
+	// public function shared_by()
 }

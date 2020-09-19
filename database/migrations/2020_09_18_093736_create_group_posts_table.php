@@ -18,7 +18,8 @@ class CreateGroupPostsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('group_id');
             $table->text('content');
-            $table->string('attachment')->nullable();
+            $table->text('attachment')->nullable();
+            $table->text('files')->nullable();
             $table->timestamps();
         });
     }

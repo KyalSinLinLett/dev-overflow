@@ -7,13 +7,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notification;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
+
 use App\Notifications\group_join_request;
 use App\Notifications\join_request_approved;
 use App\Notifications\send_pub_invite_noti;
 use App\Notifications\send_priv_invite_noti;
+use App\Notifications\priv_group_invite_accepted;
 use App\User;
 use App\Group;
 use App\Profile;
+use App\GroupPosts;
 
 class GroupController extends Controller
 {
@@ -61,7 +66,6 @@ class GroupController extends Controller
 
 	public function update(Request $request, Group $group)
 	{
-
 		$data = $request->validate([
     		'name' => 'required|max:255',
     		'description' => 'required|max:255',
@@ -71,8 +75,6 @@ class GroupController extends Controller
         if($request->groupPhoto)
         {
             $imagePath = $request->groupPhoto->store('group', 'public');
-
-            $imagePath;
 
             $image = Image::make(public_path("storage/{$imagePath}"))->fit(1000, 1000);
 
@@ -225,7 +227,9 @@ class GroupController extends Controller
 
 		$priv_inv = Auth::user()->notifications()->where('type', "App\Notifications\send_priv_invite_noti")->get();
 
-		$notifications = $join_request->merge($pub_inv)->merge($priv_inv);
+		$pri_grp_inv_accp = Auth::user()->notifications()->where('type', "App\Notifications\priv_group_invite_accepted")->get();
+
+		$notifications = $join_request->merge($pub_inv)->merge($priv_inv)->merge($pri_grp_inv_accp);
 
 		return view('group.notifications', compact('notifications')); 
 	}
@@ -288,7 +292,6 @@ class GroupController extends Controller
 
 	public function private_invite_search(Request $request)
 	{
-		// public group invites can only be sent to the users follower
 		$user = Auth::user()->where('name', 'like', '%' . $request->search_query . '%')->get();
 
 		$data = array();
@@ -336,13 +339,26 @@ class GroupController extends Controller
 		return redirect()->back()->with('success', 'Invite has been sent to '.$recipient->name);
 	}
 
-	public function accept_invite($notif)
+	public function get_sent_invites()
 	{
+		//
+	}
+
+	public function remove_sent_invite()
+	{
+		//
+	}
+
+	public function accept_invite($notif){
+
 		// once the invite is accepted, the notification is gone.
 
 		$noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
 
 		Group::find($noti[0]['data']['group'])->member()->attach(User::find($noti[0]['data']['recipient'])->profile);
+
+		// send a accepted notifications back
+		User::find($noti[0]['data']['sender'])->notify(new priv_group_invite_accepted(Auth::user()->id, $noti[0]['data']['sender'], $noti[0]['data']['group']));
 
 		DB::table('private_invite_sent_flag')->where([['sender_id', '=', $noti[0]['data']['sender']], ['recipient_id', '=', $noti[0]['data']['recipient']], ['group_id', '=', $noti[0]['data']['group']]])->delete();	
 
@@ -350,19 +366,149 @@ class GroupController extends Controller
 
 		return redirect()->back();
 
-		// send a accepted notifications back
 	}
 
 	//////////// group posts related methods ////////////////
 
-	// public function p_create(Request $request)
-	// {
-	// 	$data = $request->validate([
-    //    		'content' => 'required|max:255',
-    //            'attachment' => 'file|size:2000',
-    //    	]);
-	// }
+	public function p_create(Request $request)
+	{
+		$data = $request->validate([
+       		'content' => 'required|max:255',
+       		'attachment' => '',
+       	]);
 
+        if($request->hasFile('attachment'))
+        {
+        	$attachment = array();
+
+        	$allowedImgFileExtension=['jpeg','jpg','png','webp'];
+        	$files = $request->file('attachment');
+
+        	foreach ($files as $file) {
+
+        		$file_name = $file->getClientOriginalName();
+        		$extension = $file->getClientOriginalExtension();
+        		$file_size = $file->getSize();
+
+        		if($file_size < 10000000)
+        		{
+        			if (in_array($extension, $allowedImgFileExtension))
+	        		{
+	    			    $imagePath = $file->store('group/group_posts', 'public');
+
+	    			    $image = Image::make(public_path("storage/{$imagePath}"))->fit(800, 800);
+
+	    			    $image->save();
+
+	        			array_push($attachment, $imagePath);
+	        		}
+
+	        		else
+	        		{
+	        			return redirect()->back()->with('error', 'Only jpeg, pdf, png, jpg files accepted.');
+	        		}
+        		}
+        		else 
+        		{
+        			return redirect()->back()->with('error', 'Files cannot exceed 10MB.', array('timeout' => 3000));
+        		}
+        	}
+
+        	$attachment = collect($attachment);
+        }
+		
+		$group_post_data = array_merge($data, ['attachment' => $attachment ?? null, 'user_id' => Auth::id(), 'group_id' => (int)$request->group_id]);
+    	
+    	$group_post = GroupPosts::create($group_post_data); 
+
+        return redirect()->back()->with('success', 'Your post was successful!');
+	}
+
+	public function upload_docfiles(Group $group)
+	{
+		return view('group.upload-docfiles', compact('group'));
+	}
+
+	public function save_docfiles(Request $request)
+	{
+
+		$data = $request->validate([
+       		'content' => 'required|max:255',
+       		'files' => '',
+       	]);
+
+		if($request->hasFile('files'))
+		{
+			$files_col = array();
+
+			$allowedDocFileExtension = ['xlsx', 'xls', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'pdf', 'zip'];
+			$files = $request->file('files');
+
+			foreach($files as $file)
+			{
+				$file_name = $file->getClientOriginalName();
+        		$extension = $file->getClientOriginalExtension();
+        		$file_size = $file->getSize();
+
+        		if($file_size < 15000000)
+        		{
+        			if (in_array($extension, $allowedDocFileExtension))
+	        		{
+	    				$file_name_in_storage = time() . '@' . $file_name;
+	    				           
+	    				$path = $file->storeAs('public/group/group_posts/files',$file_name_in_storage);
+
+	    				array_push($files_col, $file_name_in_storage);
+	        		}
+	        		else
+	        		{
+	        			return redirect()->back()->with('error', 'Only xlsx, xls, doc, docx, ppt, pptx, txt, pdf, zip accepted.');
+	        		}
+        		}
+        		else 
+        		{
+        			return redirect(route('group.home', $request->group_id))->with('error', 'Files cannot exceed 15MB.');
+        		}
+			}
+
+			$files_col = collect($files_col);
+
+		}
+
+		$group_post_data = array_merge($data, ['files' => $files_col ?? null, 'user_id' => Auth::id(), 'group_id' => (int)$request->group_id]);
+    	
+    	$group_post = GroupPosts::create($group_post_data); 
+
+        return redirect(route('group.home', $request->group_id))->with('success', 'Your post was successful');
+
+	}
+
+	public function file_download($file)
+	{
+		return response()->download(storage_path('app/public/files/' . $file));
+	}
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

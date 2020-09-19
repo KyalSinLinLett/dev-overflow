@@ -16,6 +16,8 @@
 						<strong><a href="{{ route('profile.show', App\User::find($notif->data['sender'])) }}">{{ App\User::find($notif->data['sender'])->name }}</a> invited you to join <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}.</a></strong>
 					@elseif($notif->type == 'App\Notifications\send_priv_invite_noti')
 						<strong><a href="{{ route('profile.show', App\User::find($notif->data['sender'])) }}">{{ App\User::find($notif->data['sender'])->name }}</a> invited you to join a private group, <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}.</a></strong>
+					@elseif($notif->type == 'App\Notifications\priv_group_invite_accepted')
+						<strong><a href="{{ route('profile.show', App\User::find($notif->data['sender'])) }}">{{ App\User::find($notif->data['sender'])->name }}</a> accepted your invite to join the private group, <a href="{{ route('group.home', App\Group::find($notif->data['group'])) }}">{{ App\Group::find($notif->data['group'])->name }}.</a></strong>
 					@endif
 
 					@if($notif->type == 'App\Notifications\send_priv_invite_noti' && !Auth::user()->profile->member_of_groups->contains(App\Group::find($notif->data['group'])))

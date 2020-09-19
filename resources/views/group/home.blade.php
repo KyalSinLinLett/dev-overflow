@@ -4,8 +4,13 @@
 <div class="container">
 
 		@if(session()->has('success'))
-			<div class="card px-4 py-4 bg-success text-light">
+			<div id="message_id" class="card px-4 py-4 bg-success text-light">
 				{{ session()->get('success') }}
+			</div>
+		@endif
+		@if(session()->has('error'))
+			<div id="message_id" class="card px-4 py-4 bg-danger text-light">
+				{{ session()->get('error') }}
 			</div>
 		@endif
 
@@ -48,6 +53,7 @@
 	                                	{{ App\User::find($admin->user_id)->name }} | 
 	                                	@endforeach
  	                                </strong></li>
+ 	                                <li><strong>Member count: {{ $group->member->count() }}</strong></li>
 	                            </ul>
 
 	                            <div>
@@ -86,9 +92,19 @@
             	<div class="card-body">
             		<form action="{{ route('group.create-post') }}" method="post" class="form-group" enctype="multipart/form-data">
             			@csrf
-            			<textarea name="content" class="form-control mb-3" cols="50" rows="5" required></textarea> 
-            			<input type="file" accept="image/*, application/png, application/pdf, */docx" name="attachment" class="mb-3">
-            			<input type="submit" name="submit" class="btn btn-info" value="Post">
+            			<input type="hidden" name="group_id" value="{{ $group->id }}">
+            			<textarea name="content" class="form-control mb-3" cols="50" rows="5" placeholder="Share something..." required></textarea> 
+            			<label for="img">Share images to your group</label>
+            			<input id="img"
+            				   type="file" 
+            				   accept="image/*"
+            				   name="attachment[]" 
+            				   class="form control mb-3" 
+            				   multiple>
+            			<div class="mb-3">
+							<a href="{{ route('group.upload-docfiles', $group) }}">Share other files to the group</a>            				
+            			</div>
+            			<input type="submit" name="submit" class="btn btn-info form-control" value="Post">
             		</form>
             	</div>
             </div>
@@ -99,10 +115,58 @@
             </h2>
             <hr>
 
-            <!-- foreach -->
-            <div class="card">
-            	a group post
+            @forelse($group->group_posts as $gp)
+            <div class="card mb-4">
+            	<div class="card-body">
+            		<p>{{ $gp->content }}</p>
+            		<div class="row mb-3">
+            			@if($gp->attachment != null)
+	            			<div id="carouselExampleControls" class="carousel slide p-3" data-ride="carousel" data-interval="false">
+	            			  <div class="carousel-inner">
+	            			  	<div class="carousel-item active">
+	            			  	  <img class="d-block w-100" src="{{ '/storage/' . json_decode($gp->attachment)[0]}}">
+	            			  	</div>
+	            			    @foreach(json_decode($gp->attachment) as $att)
+	            			    @if($att != json_decode($gp->attachment)[0])
+	            			    <div class="carousel-item">
+	            			      <img class="d-block w-100" src="{{ '/storage/' . $att}}">
+	            			    </div>
+	            			    @endif
+	            			    @endforeach
+	            			  </div>
+	            			  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+	            			    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	            			    <span class="sr-only">Previous</span>
+	            			  </a>
+	            			  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+	            			    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+	            			    <span class="sr-only">Next</span>
+	            			  </a>
+	            			</div>
+	            			<!-- <div class="col-4">
+	            				<img src="{{ '/storage/' . $att}}" width="110%" class="img-responsive mb-2">
+	            			</div> -->
+          				@elseif($gp->files != null)
+				  			@foreach(json_decode($gp->files) as $file)
+  				  			<div class="ml-3">
+  				  				{{ $file }}
+  				  				<?php
+  				  					$file_name = explode('@', $file)[1];
+  				  				?>
+  				  				<p># <a onclick="return confirm('Do you want to download this file?')" href="{{ '/group/file-download/' . $file }}"><strong>{{ $file_name }}</strong></a></p>
+  				  			</div>
+  							@endforeach
+          				@endif
+            		</div>
+            		<p>Posted: {{ $gp->created_at->diffForHumans() }} by <a href="{{ route('profile.show', $gp->user_id) }}"><strong>{{ App\User::find($gp->user_id)->name }}</strong></a></p>
+            		
+
+            	</div>
             </div>
+            @empty
+            	<div class="my-5">There are no posts yet...</div>
+            @endforelse
+            	
             
 	    @else
 	    	<div>

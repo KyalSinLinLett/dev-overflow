@@ -17,7 +17,7 @@
 		</div>
 
 		<div class="form-group">
-			<input type="file" name="groupPhoto" accept="image/*s">
+			<input type="file" name="groupPhoto" accept="image/*">
 		</div>
 
 		<div class="form-group">

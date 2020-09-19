@@ -96,3 +96,27 @@ Route::get('/group/accept-invite/{notif}', 'GroupController@accept_invite')->nam
 
 // -> group post related routes
 Route::post('/group/create-post', 'GroupController@p_create')->name('group.create-post');
+Route::get('/group/upload-docfiles/{group}', 'GroupController@upload_docfiles')->name('group.upload-docfiles');
+Route::post('/group/save-docfiles/', 'GroupController@save_docfiles')->name('group.save-docfiles');
+Route::get('/group/file-download/{file}', 'GroupController@file_download')->name('group.file-download');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

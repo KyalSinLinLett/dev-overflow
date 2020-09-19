@@ -6,6 +6,7 @@
 
 require('./bootstrap');
 require('./search');
+require('./flashtimeout');
 
 window.Vue = require('vue');
 

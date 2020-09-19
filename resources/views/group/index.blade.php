@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
 
-	<div>
+	<div class="card p-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 		<form action="{{ route('group.create') }}" method="post">
 			@csrf
-			<h3>Create group</h3>
+			<h3>Create a group</h3>
 
 			<div class="form-group">
 				<input type="text" name="name" placeholder="Group name" class="form-control" required>
@@ -40,20 +40,27 @@
 	<hr>
 
 	<div>
-		<h3>Your groups</h3>
+		<h3>Your groups where you are admin</h3>
 		@forelse($groups as $group)
-			<div class="card">
-				<div class="card-header d-flex align-items-center">
-					<img src="{{ $group->groupImage() }}" width="35" height="35">
-					<p>Group: <a href="{{ route('group.home', $group)}}">{{ $group->name }}</a> 
+			<div class="card" style="border-radius: 2rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+				<div class="card-header bg-info d-flex align-items-center" style="border-radius: 2rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+					<a href="{{ route('group.home', $group)}}"><img src="{{ $group->groupImage() }}" width="50" height="50" style="border-radius: 50%"></a>
+					<p class="ml-3 mt-3"><strong class="text-light">Group: <a class="text-light" href="{{ route('group.home', $group)}}">{{ $group->name }}</a></strong>
 
 						@if( $group->unreadNotifications()->get()->count() > 0 )
 							<small class="text-light px-1" style="background-color: red; border-radius: 50%;"><strong>{{ $group->unreadNotifications()->get()->count() }}</strong></small>
 						@endif
+					</p>
 				</div>
 				<div class="card-body">
 					<p>Category: {{ $group->category }}</p>
-					<p>Privacy: {{ $group->privacy }}</p>
+					<p>Privacy: 
+						@if($group->privacy)
+							Private group
+						@else
+							Public group
+						@endif
+					</p>
 					<p>Description: {{ $group->description }}</p>
 					<small>Admins: 
 						@foreach($group->admin as $admin)
