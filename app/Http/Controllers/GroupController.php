@@ -410,7 +410,7 @@ class GroupController extends Controller
         		}
         		else 
         		{
-        			return redirect()->back()->with('error', 'Files cannot exceed 10MB.', array('timeout' => 3000));
+        			return redirect()->back()->with('error', 'Files cannot exceed 10MB.');
         		}
         	}
 
@@ -456,7 +456,7 @@ class GroupController extends Controller
 	        		{
 	    				$file_name_in_storage = time() . '@' . $file_name;
 	    				           
-	    				$path = $file->storeAs('public/group/group_posts/files',$file_name_in_storage);
+	    				$path = $file->storeAs('public/files',$file_name_in_storage);
 
 	    				array_push($files_col, $file_name_in_storage);
 	        		}
@@ -488,6 +488,56 @@ class GroupController extends Controller
 		return response()->download(storage_path('app/public/files/' . $file));
 	}
 
+	public function p_edit_img(GroupPosts $gp)
+	{
+		return view('group.gp-edit-img', compact('gp'));
+	}
+
+	public function p_edit_doc(GroupPosts $gp)
+	{
+		return view('group.gp-edit-doc', compact('gp'));
+	}
+
+	public function remove_img($file_name, $gp)
+	{
+		$images = json_decode(GroupPosts::find($gp)->attachment, $assoc=true);
+
+		if(sizeof($images) > 0) 
+		{
+			foreach ($images as $image) 
+			{
+				if (substr($image, 18) ==  $file_name) 
+				{
+
+					$key = array_search($image, $images);
+
+					$images = array_merge(array_diff($images, [$key => $image]));
+
+					$images = (sizeof($images) > 0) ? collect($images) : null ;
+
+					GroupPosts::find($gp)->update(['attachment' => $images]);
+					
+					Storage::delete($image);
+
+					return redirect()->back();
+				}
+			}
+		} 
+		
+		return redirect()->back();
+		
+	}
+
+	public function p_update_content(Request $request)
+	{
+		$data = $request->validate([
+			'content' => 'required|max:255',
+		]);
+
+		dd($data);
+
+		dd(GroupPosts::find($request->gp_id)->update(['content' => $data]));
+	}
 
 }
 

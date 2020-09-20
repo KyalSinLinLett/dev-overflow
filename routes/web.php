@@ -99,24 +99,10 @@ Route::post('/group/create-post', 'GroupController@p_create')->name('group.creat
 Route::get('/group/upload-docfiles/{group}', 'GroupController@upload_docfiles')->name('group.upload-docfiles');
 Route::post('/group/save-docfiles/', 'GroupController@save_docfiles')->name('group.save-docfiles');
 Route::get('/group/file-download/{file}', 'GroupController@file_download')->name('group.file-download');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::get('/group/edit/edit-post-img/{gp}', 'GroupController@p_edit_img')->name('group.groupPost-edit-img');
+Route::get('/group/edit/edit-post-doc/{gp}', 'GroupController@p_edit_doc')->name('group.groupPost-edit-doc');
+Route::post('/group/update-content-img', 'GroupController@p_update_content_img')->name('group.update-content-img');
+Route::get('/group/remove-img/{file_name}/{gp}', 'GroupController@remove_img')->name('group.remove-img');
 
 
 

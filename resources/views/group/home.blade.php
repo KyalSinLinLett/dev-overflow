@@ -116,51 +116,68 @@
             <hr>
 
             @forelse($group->group_posts as $gp)
-            <div class="card mb-4">
-            	<div class="card-body">
-            		<p>{{ $gp->content }}</p>
-            		<div class="row mb-3">
-            			@if($gp->attachment != null)
-	            			<div id="carouselExampleControls" class="carousel slide p-3" data-ride="carousel" data-interval="false">
-	            			  <div class="carousel-inner">
-	            			  	<div class="carousel-item active">
-	            			  	  <img class="d-block w-100" src="{{ '/storage/' . json_decode($gp->attachment)[0]}}">
-	            			  	</div>
-	            			    @foreach(json_decode($gp->attachment) as $att)
-	            			    @if($att != json_decode($gp->attachment)[0])
-	            			    <div class="carousel-item">
-	            			      <img class="d-block w-100" src="{{ '/storage/' . $att}}">
-	            			    </div>
-	            			    @endif
-	            			    @endforeach
-	            			  </div>
-	            			  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-	            			    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-	            			    <span class="sr-only">Previous</span>
-	            			  </a>
-	            			  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-	            			    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-	            			    <span class="sr-only">Next</span>
-	            			  </a>
-	            			</div>
-	            			<!-- <div class="col-4">
-	            				<img src="{{ '/storage/' . $att}}" width="110%" class="img-responsive mb-2">
-	            			</div> -->
-          				@elseif($gp->files != null)
-				  			@foreach(json_decode($gp->files) as $file)
-  				  			<div class="ml-3">
-  				  				{{ $file }}
-  				  				<?php
-  				  					$file_name = explode('@', $file)[1];
-  				  				?>
-  				  				<p># <a onclick="return confirm('Do you want to download this file?')" href="{{ '/group/file-download/' . $file }}"><strong>{{ $file_name }}</strong></a></p>
-  				  			</div>
-  							@endforeach
-          				@endif
-            		</div>
-            		<p>Posted: {{ $gp->created_at->diffForHumans() }} by <a href="{{ route('profile.show', $gp->user_id) }}"><strong>{{ App\User::find($gp->user_id)->name }}</strong></a></p>
-            		
-
+            <div class="card mb-3">
+        		<div class="card-header p-3">
+        			<div class="d-flex justify-content-between">
+        				<div class="d-flex align-items-center">
+        					<img  class="mr-3" src="{{ App\User::find($gp->user_id)->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%;">
+        					<strong>
+        						<a href="{{ route('profile.show', $gp->user_id) }}">{{ App\User::find($gp->user_id)->name }}</a> posted {{ $gp->created_at->diffForHumans() }}
+        					</strong>
+        				</div>
+        				@if($gp->user_id == Auth::id())
+        				<div class="d-flex align-items-center">
+        					@if($gp->attachment != null)
+        					<a href="{{ route('group.groupPost-edit-img', $gp) }}">Edit post</a> &nbsp|&nbsp
+        					@elseif($gp->files != null)        					
+        					<a href="{{ route('group.groupPost-edit-doc', $gp) }}">Edit post</a> &nbsp|&nbsp
+        					@endif
+        					<a href="">Delete</a>
+        				</div>
+        				@endif
+        			</div>
+        		</div>
+        		<div class="card-body pl-4 pr-4 pt-4 pb-2"> 
+        			<p class="pl-3 mt-3"><strong>{{ $gp->content }}</strong></p>
+          			@if($gp->attachment != null)
+          				@if(sizeof(json_decode($gp->attachment, $assoc=true)) > 1 )
+            			<div id="carouselExampleControlsOri" class="carousel slide p-2" data-ride="carousel">
+            			  <div class="carousel-inner">
+            			  	<div class="carousel-item active">
+            			  	  <img class="d-block w-100" src="{{ '/storage/' . json_decode($gp->attachment, $assoc=true)[0] }}">
+            			  	</div>
+            			    @foreach(json_decode($gp->attachment) as $att)
+            				    @if($att != json_decode($gp->attachment, $assoc=true)[0])
+            				    <div class="carousel-item">
+            				      <img class="d-block w-100" src="{{ '/storage/' . $att }}">
+            				    </div>
+            				    @endif
+            			    @endforeach
+            			  </div>
+            			  <a class="carousel-control-prev" href="#carouselExampleControlsOri" role="button" data-slide="prev">
+            			    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            			    <span class="sr-only">Previous</span>
+            			  </a>
+            			  <a class="carousel-control-next" href="#carouselExampleControlsOri" role="button" data-slide="next">
+            			    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            			    <span class="sr-only">Next</span>
+            			  </a>
+            			</div>
+            			@else
+            				<div>
+            					<img class="d-block w-100" src="{{ '/storage/' . json_decode($gp->attachment, $assoc=true)[0] }}">
+            				</div>
+            			@endif
+      				@elseif($gp->files != null)
+			  			@foreach(json_decode($gp->files) as $file)
+				  			<div class="ml-3">
+				  				<?php
+				  					$file_name = explode('@', $file)[1];
+				  				?>
+				  				<p><b>#</b> <a onclick="return confirm('Do you want to download this file?')" href="{{ '/group/file-download/' . $file }}"><strong>{{ $file_name }}</strong></a></p>
+				  			</div>
+						@endforeach
+      				@endif
             	</div>
             </div>
             @empty
