@@ -87,7 +87,7 @@
 		@if(!$group->privacy || $group->admin->contains(Auth::user()->profile) || $group->member->contains(Auth::user()->profile))
             <div class="card" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
             	<div class="card-header bg-dark text-light" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
-            		Share something to the group
+            		<h3 class="mt-2">Share something to the group</h3>
             	</div>	
             	<div class="card-body">
             		<form action="{{ route('group.create-post') }}" method="post" class="form-group" enctype="multipart/form-data">
@@ -116,29 +116,32 @@
             <hr>
 
             @forelse($group->group_posts as $gp)
-            <div class="card mb-3">
-        		<div class="card-header p-3">
-        			<div class="d-flex justify-content-between">
+            <div class="card mb-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+        		<div class="card-header p-3 bg-dark text-light" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+        			<div class="d-flex justify-content-between pr-2">
         				<div class="d-flex align-items-center">
-        					<img  class="mr-3" src="{{ App\User::find($gp->user_id)->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%;">
+        					<a href="{{ route('profile.show', $gp->user_id) }}"><img  class="mr-3" src="{{ App\User::find($gp->user_id)->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%;"></a>
         					<strong>
-        						<a href="{{ route('profile.show', $gp->user_id) }}">{{ App\User::find($gp->user_id)->name }}</a> posted {{ $gp->created_at->diffForHumans() }}
+        						<a style="text-decoration: none; color: white;" href="{{ route('profile.show', $gp->user_id) }}"><strong>{{ App\User::find($gp->user_id)->name }}</strong></a> posted {{ $gp->created_at->diffForHumans() }}
         					</strong>
         				</div>
         				@if($gp->user_id == Auth::id())
         				<div class="d-flex align-items-center">
         					@if($gp->attachment != null)
-        					<a href="{{ route('group.groupPost-edit-img', $gp) }}">Edit post</a> &nbsp|&nbsp
+        					<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-img', $gp) }}">Edit post</a> &nbsp|&nbsp
         					@elseif($gp->files != null)        					
-        					<a href="{{ route('group.groupPost-edit-doc', $gp) }}">Edit post</a> &nbsp|&nbsp
+        					<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-doc', $gp) }}">Edit post</a> &nbsp|&nbsp
+        					@else
+        						<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-img', $gp) }}">Add images</a> &nbsp|&nbsp
+        						<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-doc', $gp) }}">Add files</a> &nbsp|&nbsp
         					@endif
-        					<a href="">Delete</a>
+        					<a style="text-decoration: none; color: red;" onclick="return confirm('Do you want to delete this post?')" href="{{ route('group.groupPost-delete', $gp) }}">Delete</a>
         				</div>
         				@endif
         			</div>
         		</div>
         		<div class="card-body pl-4 pr-4 pt-4 pb-2"> 
-        			<p class="pl-3 mt-3"><strong>{{ $gp->content }}</strong></p>
+        			<a style="text-decoration: none; color: black;" href="{{ route('group.view-post', $gp) }}"><p class="pl-3 mt-3"><strong>{{ $gp->content }}</strong></p></a>
           			@if($gp->attachment != null)
           				@if(sizeof(json_decode($gp->attachment, $assoc=true)) > 1 )
             			<div id="carouselExampleControlsOri" class="carousel slide p-2" data-ride="carousel">

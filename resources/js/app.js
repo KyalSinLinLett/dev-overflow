@@ -25,7 +25,6 @@ Vue.component('follow-component', require('./components/follow/FollowComponent.v
 Vue.component('message-component', require('./components/message/MessageComponent.vue').default);
 Vue.component('like-component', require('./components/like/LikeComponent.vue').default);
 
-
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

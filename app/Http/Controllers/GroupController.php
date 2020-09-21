@@ -519,24 +519,181 @@ class GroupController extends Controller
 					
 					Storage::delete($image);
 
-					return redirect()->back();
+					return redirect()->back()->with('success', 'Image is removed');
 				}
 			}
 		} 
 		
-		return redirect()->back();
-		
+		return redirect()->back()->with('error', 'There was an unexpected error.');	
 	}
 
-	public function p_update_content(Request $request)
+	public function remove_doc($file, $gp)
+	{
+
+		$files = json_decode(GroupPosts::find($gp)->files, $assoc=true);
+
+		if(sizeof($files) > 0) 
+		{
+			foreach ($files as $f) 
+			{
+				if ($f ==  $file) 
+				{
+					$key = array_search($f, $files);
+
+					$files = array_merge(array_diff($files, [$key => $f]));
+
+					$files = (sizeof($files) > 0) ? collect($files) : null ;
+
+					GroupPosts::find($gp)->update(['files' => $files]);
+					
+					Storage::delete('public/files/' . $file);
+
+					return redirect()->back()->with('success', 'File is removed');
+				}
+			}
+		} 
+		
+		return redirect()->back()->with('error', 'There was an unexpected error.');	
+	}
+
+	public function p_update_content_img(Request $request)
 	{
 		$data = $request->validate([
 			'content' => 'required|max:255',
 		]);
 
-		dd($data);
+		$curr_att = json_decode(GroupPosts::find($request->gp_id)->attachment) ?? [];
 
-		dd(GroupPosts::find($request->gp_id)->update(['content' => $data]));
+		if($request->hasFile('attachment'))
+        {
+        	$allowedImgFileExtension=['jpeg','jpg','png','webp'];
+        	$files = $request->file('attachment');
+
+        	foreach ($files as $file) {
+
+        		$file_name = $file->getClientOriginalName();
+        		$extension = $file->getClientOriginalExtension();
+        		$file_size = $file->getSize();
+
+        		if($file_size < 10000000)
+        		{
+        			if (in_array($extension, $allowedImgFileExtension))
+	        		{
+	    			    $imagePath = $file->store('group/group_posts', 'public');
+
+	    			    $image = Image::make(public_path("storage/{$imagePath}"))->fit(800, 800);
+
+	    			    $image->save();
+
+	        			array_push($curr_att, $imagePath);
+	        		}
+
+	        		else
+	        		{
+	        			return redirect()->back()->with('error', 'Only jpeg, pdf, png, jpg files accepted.');
+	        		}
+        		}
+        		else 
+        		{
+        			return redirect()->back()->with('error', 'Files cannot exceed 10MB.');
+        		}
+        	}
+        }
+
+        $new_att = (sizeof($curr_att) > 0 ) ? collect($curr_att) : null;
+
+        $group_updated_data = array_merge($data, ['attachment' => $new_att]);
+
+		GroupPosts::find($request->gp_id)->update($group_updated_data);
+
+		return redirect()->back()->with('success', 'post is updated!');
+	}
+
+	public function p_update_content_doc(Request $request)
+	{
+		$data = $request->validate([
+			'content' => 'required|max:255',
+		]);
+
+		$curr_files = json_decode(GroupPosts::find($request->gp_id)->files) ?? [];
+
+		if($request->hasFile('files'))
+		{
+
+			$allowedDocFileExtension = ['xlsx', 'xls', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'pdf', 'zip'];
+			$files = $request->file('files');
+
+			foreach($files as $file)
+			{
+				$file_name = $file->getClientOriginalName();
+        		$extension = $file->getClientOriginalExtension();
+        		$file_size = $file->getSize();
+
+        		if($file_size < 15000000)
+        		{
+        			if (in_array($extension, $allowedDocFileExtension))
+	        		{
+	    				$file_name_in_storage = time() . '@' . $file_name;
+	    				           
+	    				$path = $file->storeAs('public/files',$file_name_in_storage);
+
+	    				array_push($curr_files, $file_name_in_storage);
+	        		}
+	        		else
+	        		{
+	        			return redirect()->back()->with('error', 'Only xlsx, xls, doc, docx, ppt, pptx, txt, pdf, zip accepted.');
+	        		}
+        		}
+        		else 
+        		{
+        			return redirect(route('group.home', $request->group_id))->with('error', 'Files cannot exceed 15MB.');
+        		}
+			}
+		}
+
+        $new_files = (sizeof($curr_files) > 0 ) ? collect($curr_files) : null;
+
+        $group_updated_data = array_merge($data, ['files' => $new_files]);
+
+		GroupPosts::find($request->gp_id)->update($group_updated_data);
+
+		return redirect()->back()->with('success', 'post is updated!');
+	}
+
+	public function delete_post(GroupPosts $gp)
+	{
+
+		if($gp->attachment != null)
+		{
+			$attachments = json_decode($gp->attachment, $assoc=true);
+
+			foreach ($attachments as $att) 
+			{
+				Storage::delete('public/' . $att);
+			}
+		}
+		elseif ($gp->files != null) 
+		{
+			$files = json_decode($gp->files, $assoc=true);
+
+			foreach ($files as $file) 
+			{
+				Storage::delete('public/files/' . $file);
+			}
+		}
+
+		$gp->delete();
+
+		return redirect()->back()->with('success', 'Post is deleted');
+	}
+
+	public function view_post(GroupPosts $gp)
+	{
+		$type = "gp";
+
+		$likes = (auth()->user()) ? auth()->user()->liked_group_posts->contains($gp->id) : false;
+
+		return view('group.view-post', compact('gp', 'likes', 'type'));
 	}
 
 }

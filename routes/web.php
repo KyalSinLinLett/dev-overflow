@@ -31,7 +31,8 @@ Route::get('/comment/delete/{comment}', 'CommentController@delete')->name('comme
 Route::post('/follow/{user}', 'FollowsController@store');
 
 //like related routes
-Route::post('/like/{post}', 'LikeController@store');
+Route::post('/like/{post}/{type}', 'LikeController@store');
+
 
 //profile related routes
 Route::get('/profile/{user}', 'ProfileController@index')->name('profile.show');
@@ -102,7 +103,9 @@ Route::get('/group/file-download/{file}', 'GroupController@file_download')->name
 Route::get('/group/edit/edit-post-img/{gp}', 'GroupController@p_edit_img')->name('group.groupPost-edit-img');
 Route::get('/group/edit/edit-post-doc/{gp}', 'GroupController@p_edit_doc')->name('group.groupPost-edit-doc');
 Route::post('/group/update-content-img', 'GroupController@p_update_content_img')->name('group.update-content-img');
+Route::post('/group/update-content-doc', 'GroupController@p_update_content_doc')->name('group.update-content-doc');
 Route::get('/group/remove-img/{file_name}/{gp}', 'GroupController@remove_img')->name('group.remove-img');
-
-
+Route::get('/group/remove-doc/{file}/{gp}', 'GroupController@remove_doc')->name('group.remove-doc');
+Route::get('/group/group-post/delete/{gp}', 'GroupController@delete_post')->name('group.groupPost-delete');
+Route::get('/group/view-post/{gp}', 'GroupController@view_post')->name('group.view-post');
 

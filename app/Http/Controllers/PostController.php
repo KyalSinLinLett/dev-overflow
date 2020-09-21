@@ -50,9 +50,11 @@ class PostController extends Controller
 
    	public function show(Post $post)
    	{
+      $type = "post";
+
       $likes = (auth()->user()) ? auth()->user()->liked_posts->contains($post->id) : false;
 
-   		return view('post.show', compact('post', 'likes'));
+   		return view('post.show', compact('post', 'likes', 'type'));
    	}
 
     public function feed(){

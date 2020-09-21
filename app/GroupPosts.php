@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Group;
+use App\User;
 
 class GroupPosts extends Model
 {
@@ -17,9 +18,11 @@ class GroupPosts extends Model
 		return $this->belongsTo(Group::class);
 	}
 
-	// public function liked_by()
+	public function liked_by()
+	{
+		return $this->belongsToMany(User::class);
+	}
 
 	// public function comments()
 
-	// public function shared_by()
 }

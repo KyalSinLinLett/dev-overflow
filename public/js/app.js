@@ -1959,22 +1959,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  // props: ['id', 'likes', 'likecount'],
-  props: ['id', 'likes'],
+  props: ['id', 'likes', 'type'],
   data: function data() {
     return {
-      status: this.likes // l_count: this.likecount,
-
+      status: this.likes
     };
   },
   methods: {
     likePost: function likePost() {
       var _this = this;
 
-      axios.post('/like/' + this.id).then(function (response) {
-        _this.status = !_this.status; // window.location = window.location; // this is temporary. Will make the like count change without reloading.
-        // window.location = '/post/' + this.id;
-        // this.l_count = response.data.like_count;
+      axios.post('/like/' + this.id + '/' + this.type).then(function (response) {
+        _this.status = !_this.status;
       })["catch"](function (errors) {
         if (errors.response.status == 401) {
           window.location = '/login';
@@ -1985,10 +1981,7 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     buttonText: function buttonText() {
       return this.status ? 'Unlike' : 'Like';
-    } // likeCount() {
-    //     return this.l_count;
-    // }
-
+    }
   }
 });
 

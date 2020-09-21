@@ -112,7 +112,7 @@
 
 	    <div class="rows">
 	    	<div class="col d-flex">
-	    		<like-component id="{{ $post->id }}" likes="{{ $likes }}"></like-component>
+	    		<like-component id="{{ $post->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
 
 	    		@if(!auth()->user()->shared_posts->contains($post))
 	    			<a href="{{ route('post.share', $post) }}">Share post</a>

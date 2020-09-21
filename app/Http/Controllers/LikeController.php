@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Post;
+use App\GroupPosts;
 
 class LikeController extends Controller
 {
@@ -13,13 +14,29 @@ class LikeController extends Controller
     	$this->middleware('auth');
     }
 
-    public function store(Post $post)
+    public function store($id, $type)
     {
-    	$response = [
-    		"toggle" => auth()->user()->liked_posts()->toggle($post), 
-    		"like_count" => $post->liked_by->count()
-    	];
+    	$response = [];
+
+        switch ($type) {
+            case 'post':
+                $post = Post::find($id);
+                $response = [
+                    "toggle" => auth()->user()->liked_posts()->toggle($post), 
+                    "like_count" => $post->liked_by->count()
+                ]; 
+                break;
+
+            case 'gp':
+                $gp = GroupPosts::find($id);
+                $response = [
+                    "toggle" => auth()->user()->liked_group_posts()->toggle($gp), 
+                    "like_count" => $gp->liked_by->count()
+                ]; 
+                break;
+        }
 
     	return $response;
     }
+
 }

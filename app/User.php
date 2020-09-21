@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Profile;
 use App\Post;
+use App\GroupPosts;
 
 class User extends Authenticatable
 {
@@ -77,6 +78,11 @@ class User extends Authenticatable
     public function liked_posts()
     {
         return $this->belongsToMany(Post::class)->orderBy('created_at', 'DESC');
+    }
+
+    public function liked_group_posts()
+    {
+        return $this->belongsToMany(GroupPosts::class)->orderBy('created_at', 'DESC');
     }
 
     public function shared_posts()
