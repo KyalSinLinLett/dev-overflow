@@ -23,6 +23,9 @@ class GroupPosts extends Model
 		return $this->belongsToMany(User::class);
 	}
 
-	// public function comments()
+	public function gp_comments()
+	{
+		return $this->hasMany(GPComment::class)->orderBy('created_at', 'DESC');
+	}
 
 }

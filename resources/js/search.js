@@ -156,7 +156,56 @@
 
 	// user search for private invite //
 
+	// post search admin panel //
 
+	$(document).ready(function(){
+	  $("#clearbtn4").hide();
+	});	
+
+	$('body').on('keyup', '#search-post', function(){
+	    var search_query = $(this).val();
+		var group_id = $(this).attr("name");
+
+		$(document).ready(function(){
+		  $("#clearbtn4").show();
+		});	
+
+
+	    // console.log(search_query);
+	    $.ajax({
+	    	method: 'get',	
+	    	url: '/group/group-post/search',
+	    	dataType: 'json',
+	    	data: {
+	    		'_token': '{{ csrf_token() }}',
+	    		search_query: search_query,
+	    		group_id: group_id,
+	    	},
+
+	    	success: function(res){
+
+				var tableRow = '';
+
+				$('#dyn-row-posts').html('');
+
+				$.each(res, function(index, value){
+
+					tableRow = '<tr><td>' + value.id + '</td><td><a href="/group/view-post/' + value.id + '">' + value.content + '</a></td><td><a href="/profile/' + value.user_id + '">' + value.name + '</a></td>+<td>' + value.status + '</td><td>' + value.attachment + '</td><td>' + value.created_at + '</td><td>' + value.like_count + '</td><td>' + value.cmt_count + '</td><td><a onclick="return confirm(`Are you sure you want to delete this post?`)" href="/group/group-post/delete/' + value.id +'">Remove post</a></td></tr>'
+
+					$('#dyn-row-posts').append(tableRow);
+				});
+	    	}
+	    });
+	});
+
+	$(document).ready(function(){
+	  $("#clearbtn4").click(function(){
+	    location.reload();
+	  });
+	});
+
+
+	// post search admin panel //
 
 
 

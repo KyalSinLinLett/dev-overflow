@@ -75,8 +75,17 @@ Route::get('/group/admin/remove-member/{member}/{group}', 'GroupController@remov
 Route::get('/group/admin/remove-admin/{admin}/{group}', 'GroupController@remove_admin')->name('group.remove-admin');
 Route::get('/group/admin/approve-request/{group}/{user}/{notif}', 'GroupController@approve_request')->name('group.approve-request');
 
+// -> group reports
+Route::get('/group/admin/priv-report-panel/{group}', 'GroupController@priv_report_show_notif')->name('group.priv-reports-panel');
+Route::get('/group/admin/pub-reports-panel/{group}', 'GroupController@pub_report_show_notif')->name('group.pub-reports-panel');
+Route::get('/group/admin/make-priv-report/{gp}', 'GroupController@make_priv_report')->name('group.make-priv-report');
+Route::get('/group/admin/make-pub-report/{gp}', 'GroupController@make_pub_report')->name('group.make-pub-report');
+
+
 // -> group search member to add
 Route::get('/group/member/search', 'GroupController@search_member')->name('group.member-search');
+// -> group admin search post
+Route::get('/group/group-post/search', 'GroupController@find_post')->name('group.post-search');
 
 // -> group notifications related routes
 Route::get('/group/join-request/{user}/{group}', 'GroupController@send_join_notification')->name('group.join-notif');
@@ -109,3 +118,8 @@ Route::get('/group/remove-doc/{file}/{gp}', 'GroupController@remove_doc')->name(
 Route::get('/group/group-post/delete/{gp}', 'GroupController@delete_post')->name('group.groupPost-delete');
 Route::get('/group/view-post/{gp}', 'GroupController@view_post')->name('group.view-post');
 
+// -> group post comments
+Route::post('/group/gp-comment/{gp}', 'CommentController@gp_comment_store')->name('group.gp-comment');
+Route::get('/group/gp-comment-edit/{gp_cmt}', 'CommentController@gp_comment_edit')->name('group.gp-comment-edit');
+Route::post('/group/gp-comment-update', 'CommentController@gp_comment_update')->name('group.gp-comment-update');
+Route::get('/group/gp-comment-delete/{gp_cmt}', 'CommentController@gp_comment_delete')->name('group.gp-comment-delete');

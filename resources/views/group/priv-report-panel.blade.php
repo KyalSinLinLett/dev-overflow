@@ -23,7 +23,7 @@
 		  </li>
 		  @if(!$group->privacy)
 		  <li class="nav-item">
-		        <a class="nav-link active" href="{{ route('group.requests-panel', $group) }}">
+		        <a class="nav-link" href="{{ route('group.requests-panel', $group) }}">
 		        	Requests: 
 		        	@if( $group->unreadNotifications()->where('type', 'App\Notifications\group_join_request')->get()->count() > 0 )
 		    			<small class="text-light px-2" style="background-color: red; border-radius: 50%;">
@@ -39,7 +39,7 @@
 		  </li>
 		  @else
 		  <li class="nav-item">
-		  		<a class="nav-link" href="{{ route('group.priv-reports-panel', $group) }}">
+		  		<a class="nav-link active" href="{{ route('group.priv-reports-panel', $group) }}">
 		        	Reports: 
 		    	</a>
 		  </li>
@@ -49,24 +49,31 @@
 	<hr>
 
 	<!-- Refactor this -->
-	<h3>Pending requests</h3>
+	<h3>Pending reports</h3>
 	<hr>
 	
-	@forelse($notifications as $notif)
-	<div class="card p-3 text-white bg-light mb-3" style="border-radius: 2rem;">
-		<div class="d-flex align-items-center pl-2 justify-content-between">
+	@forelse($priv_report_notif as $notif)
+	<div class="card" style="border-radius: 2rem;">
+		<div class="card-body d-flex align-items-center justify-content-between">
 			<div>
-				<img src="{{ App\User::find($notif->data['user']['id'])->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%; margin-right: 20px;">
-				<strong><a style="font-size: 20px;" href="{{ route('profile.show', $notif->data['user']['id']) }}">{{ $notif->data['user']['name'] }}</a></strong>
+				<p class="my-1 ml-3"><a href="{{ route('profile.show', $notif->data['sender']) }}">{{ App\User::find($notif->data['sender'])->name }}</a> reported <a href="{{ route('group.view-post', $notif->data['gp']) }}">{{ substr(App\GroupPosts::find($notif->data['gp'])->content, 0, 20) . "..." }}</a></p>
 			</div>
 			
 			<div>
-				<a class="btn btn-success mr-4" style="font-size: 17px;" href="{{ route('group.approve-request', [$group, $notif->data['user']['id'], $notif]) }}">Approve</a>
+				<?php 
+					$read = ($notif->read_at != null) ? true : false; 
+				?>
+
+				@if(!$read)
+				<a href="{{ route('group.noti-mar', $notif) }}">Mark as read</a>
+				@else
+				<a href="{{ route('group.noti-rmv', $notif) }}">Remove</a>					
+				@endif
 			</div>
 		</div>
 	</div>
 	@empty
-		<p><marquee> Tell some of your friends to join this group! </marquee></p>
+		No reports so far...
 	@endforelse
 	
 	<!-- refactor this -->

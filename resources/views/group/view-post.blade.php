@@ -2,6 +2,19 @@
 
 @section('content')
 <div class="container">
+	<h2>View post</h2>
+	<hr>
+	@if(session()->has('success'))
+		<div id="message_id" class="card px-4 py-4 bg-success text-light">
+			{{ session()->get('success') }}
+		</div>
+	@endif
+	@if(session()->has('error'))
+		<div id="message_id" class="card px-4 py-4 bg-danger text-light">
+			{{ session()->get('error') }}
+		</div>
+	@endif
+	
     <div class="card mb-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 		<div class="card-header p-3 bg-dark text-light" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 			<div class="d-flex justify-content-between pr-2">
@@ -11,8 +24,8 @@
 						<a style="text-decoration: none; color: white;" href="{{ route('profile.show', $gp->user_id) }}"><strong>{{ App\User::find($gp->user_id)->name }}</strong></a> posted {{ $gp->created_at->diffForHumans() }}
 					</strong>
 				</div>
-				@if($gp->user_id == Auth::id())
 				<div class="d-flex align-items-center">
+				@if($gp->user_id == Auth::id())
 					@if($gp->attachment != null)
 					<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-img', $gp) }}">Edit post</a> &nbsp|&nbsp
 					@elseif($gp->files != null)        					
@@ -22,8 +35,14 @@
 						<a style="text-decoration: none; color: white;" href="{{ route('group.groupPost-edit-doc', $gp) }}">Add files</a> &nbsp|&nbsp
 					@endif
 					<a style="text-decoration: none; color: red;" onclick="return confirm('Do you want to delete this post?')" href="{{ route('group.groupPost-delete', $gp) }}">Delete</a>
-				</div>
+				@else
+					@if(App\Group::find($gp->group_id)->privacy)
+					<a style="text-decoration: none; color: red;" href="{{ route('group.make-priv-report', $gp) }}">Report</a>
+					@else
+					<a style="text-decoration: none; color: red;" href="{{ route('group.make-pub-report', $gp) }}">Report</a>
+					@endif
 				@endif
+				</div>
 			</div>
 		</div>
 		<div class="card-body pl-4 pr-4 pt-2 pb-4"> 
@@ -69,15 +88,40 @@
 
 				<like-component id="{{ $gp->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
 
-				<form>
+				<form action="{{ route('group.gp-comment', $gp) }}" method='POST'>
+					@csrf
 					<div class="form-group">
 						<input type="text" name="comment" placeholder="Comment..." required>
-						<button class="btn btn-warning">Comment</button>
+						<button type="submit" class="btn btn-warning">Comment</button>
 					</div>
 				</form>
 
 			</div>
     	</div>
    	</div>
+
+	@forelse($gp->gp_comments as $gp_cmt)
+		<div class="card px-3 py-3 mb-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+			<div class="d-flex align-items-center justify-content-between">
+				<div>
+					<a href="{{ route('profile.show', $gp_cmt->user_id) }}"><img class="mr-3" src="{{ App\User::find($gp_cmt->user_id)->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%;"></a>
+					<a href="{{ route('profile.show', $gp_cmt->user_id) }}">{{ App\User::find($gp_cmt->user_id)->name }}</a> - 
+					{{ $gp_cmt->comment }}
+				</div>
+				
+				<div>
+					@if($gp_cmt->user_id == Auth::id())
+						<a href="{{ route('group.gp-comment-edit', $gp_cmt) }}">Edit</a> &nbsp|&nbsp
+						<a onclick="return confirm('Are you sure you want to delete this comment?')" href="{{ route('group.gp-comment-delete', $gp_cmt) }}">Delete</a> &nbsp|&nbsp
+					@endif
+
+					<small>{{ $gp_cmt->created_at->diffForHumans() }}</small>
+				</div>
+			</div>
+			
+		</div>
+	@empty
+	@endforelse
+
 </div>
 @endsection

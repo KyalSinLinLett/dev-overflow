@@ -181,6 +181,12 @@
 				  			</div>
 						@endforeach
       				@endif
+
+                    <div class="d-flex ml-3 mb-3 mt-2">
+                        Likes: {{ $gp->liked_by->count() }}
+                        Comments: {{ $gp->gp_comments->count() }}
+                    </div>
+
             	</div>
             </div>
             @empty

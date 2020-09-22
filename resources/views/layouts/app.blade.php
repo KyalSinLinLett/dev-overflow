@@ -63,7 +63,7 @@
 
                                     <a class="dropdown-item" href="{{ route('group.index') }}">Groups I'm admin</a>
 
-                                    <a class="dropdown-item" href="{{ route('group.joined') }}">Groups I've joined</a>
+                                    <a class="dropdown-item" href="{{ route('group.joined') }}">Groups I'm member</a>
 
                                     <a class="dropdown-item" href="{{ route('group.noti') }}">Groups notifications: <small class="text-light px-2 py-1" style="background-color: red; border-radius: 50%;"><strong>{{ Auth::user()->unreadNotifications()->where('type', "App\Notifications\join_request_approved")->get()->count() + Auth::user()->unreadNotifications()->where('type', "App\Notifications\send_pub_invite_noti")->get()->count() + Auth::user()->unreadNotifications()->where('type', "App\Notifications\send_priv_invite_noti")->get()->count() + Auth::user()->unreadNotifications()->where('type', "App\Notifications\priv_group_invite_accepted")->get()->count() }}</strong></small></a>
                                   

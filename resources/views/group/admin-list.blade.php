@@ -27,16 +27,29 @@
 		  <li class="nav-item">
 		    <a class="nav-link active" href="{{ route('group.admin-panel', $group) }}">Admins</a>
 		  </li>
+		  @if(!$group->privacy)
 		  <li class="nav-item">
 		        <a class="nav-link" href="{{ route('group.requests-panel', $group) }}">
 		        	Requests: 
-		        	@if( $group->unreadNotifications()->get()->count() > 0 )
+		        	@if( $group->unreadNotifications()->where('type', 'App\Notifications\group_join_request')->get()->count() > 0 )
 		    			<small class="text-light px-2" style="background-color: red; border-radius: 50%;">
-		    				<strong>{{ $group->unreadNotifications()->get()->count() }}</strong>
+		    				<strong>{{ $group->unreadNotifications()->where('type', 'App\Notifications\group_join_request')->get()->count() }}</strong>
 		    			</small>
 		    		@endif
 		    	</a>
 		  </li>
+		  <li class="nav-item">
+		        <a class="nav-link" href="{{ route('group.pub-reports-panel', $group) }}">
+		        	Reports: 
+		    	</a>
+		  </li>
+		  @else
+		  <li class="nav-item">
+		  		<a class="nav-link" href="{{ route('group.priv-reports-panel', $group) }}">
+		        	Reports: 
+		    	</a>
+		  </li>
+		  @endif
 		</ul>
 	</div>
 	<hr>

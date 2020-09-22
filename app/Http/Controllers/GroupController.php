@@ -15,6 +15,9 @@ use App\Notifications\join_request_approved;
 use App\Notifications\send_pub_invite_noti;
 use App\Notifications\send_priv_invite_noti;
 use App\Notifications\priv_group_invite_accepted;
+use App\Notifications\report_post;
+use App\Notifications\report_pub_post;
+
 use App\User;
 use App\Group;
 use App\Profile;
@@ -142,6 +145,7 @@ class GroupController extends Controller
 	public function remove_member(Profile $member, Group $group)
 	{
 		$group->member()->detach($member);	
+		$group->group_posts()->where('user_id', $member->id)->delete();
 		return redirect()->back();
 	}
 
@@ -193,7 +197,9 @@ class GroupController extends Controller
 
 	public function join_requests(Group $group)
 	{
-		return view('group.requests-panel', compact('group'));
+		$notifications = $group->notifications()->where('type', 'App\Notifications\group_join_request')->get();
+
+		return view('group.requests-panel', compact(['group', 'notifications']));
 	}
 
 	public function approve_request(Group $group, User $user, $notif)
@@ -236,22 +242,56 @@ class GroupController extends Controller
 
 	public function mark_as_read($notif)
 	{
-		Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+		$noti = json_decode(json_encode(DB::table('notifications')->where('id', $notif)->get(['type', 'data'])), $assoc=true);
+		$data = json_decode($noti[0]['data'], $assoc=true);
+
+		switch ($noti[0]['type']) 
+		{
+			case 'App\Notifications\report_post':
+				Group::find($data['group'])->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+			
+			case 'App\Notifications\join_request_approved':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\report_pub_post':
+				Group::find($data['group'])->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+		}
 		
 		return redirect()->back();
 	}
 
 	public function remove_noti($notif)
 	{
-		$noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
+		$noti = json_decode(json_encode(DB::table('notifications')->where('id', $notif)->get(['type', 'data'])), $assoc=true);
+		$data = json_decode($noti[0]['data'], $assoc=true);
 
-		if ($noti[0]['type'] == 'App\Notifications\send_pub_invite_noti')
+		// $noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
+
+		// dd($noti);
+
+		switch($noti[0]['type'])
 		{
-			DB::table('public_invite_sent_flag')->where([['sender_id', '=', $noti[0]['data']['sender']], ['recipient_id', '=', $noti[0]['data']['recipient']], ['group_id', '=', $noti[0]['data']['group']]])->delete();	
+			case 'App\Notifications\report_post':
+				Group::find($data['group'])->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\report_pub_post':
+				Group::find($data['group'])->notifications()->where('id', $notif)->delete();
+				break;
+			
+			case 'App\Notifications\join_request_approved':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\send_pub_invite_noti':
+				DB::table('public_invite_sent_flag')->where([['sender_id', '=', $data['sender']], ['recipient_id', '=', $data['recipient']], ['group_id', '=', $data['group']]])->delete();
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
 		}
 	
-		Auth::user()->notifications()->where('id', $notif)->delete();
-
 		return redirect()->back();
 	}
 
@@ -319,6 +359,44 @@ class GroupController extends Controller
 		return json_encode($data);
 	}
 
+	public function find_post(Request $request)
+	{	
+		try {
+
+			$data = GroupPosts::where([['group_id', '=', $request->group_id], ['content', 'like', '%' . $request->search_query . '%']])->latest()->get();
+			
+			$group = Group::find($request->group_id);
+			
+			$group_post = array(); 
+
+			foreach($data as $gp)
+			{
+				if($gp->attachment != null){ $att = 'Images'; }
+				elseif($gp->files != null){ $att = 'Files'; }
+				else{ $att = "No attachments"; }
+
+				array_push($group_post, [
+					'id' => $gp->id,
+					'content' => substr($gp->content, 0, 20) . "...",
+					'name' => User::find($gp->user_id)->name,
+					'user_id' => $gp->user_id,
+					'status' => ($group->member->contains(User::find($gp->user_id)->profile)) ? "M" : "A",
+					'attachment' => $att,
+					'created_at' => $gp->created_at->diffForHumans(),
+					'like_count' => $gp->liked_by->count(),
+					'cmt_count' => $gp->gp_comments->count()
+				]);
+			}
+
+			return json_encode($group_post);
+
+		} catch (Exception $e) {
+
+			return json_encode(['error' => $e]);
+
+		}
+	}
+
 	public function send_pub_invite_noti(User $sender, User $recipient, Group $group)
 	{
 		$recipient->notify(new send_pub_invite_noti($sender, $recipient, $group));
@@ -337,16 +415,6 @@ class GroupController extends Controller
 		DB::table('private_invite_sent_flag')->insert(['sender_id' => $sender->id, 'recipient_id' => $recipient->id, 'group_id' => $group->id, 'sent' => 1]);
 
 		return redirect()->back()->with('success', 'Invite has been sent to '.$recipient->name);
-	}
-
-	public function get_sent_invites()
-	{
-		//
-	}
-
-	public function remove_sent_invite()
-	{
-		//
 	}
 
 	public function accept_invite($notif){
@@ -694,6 +762,50 @@ class GroupController extends Controller
 		$likes = (auth()->user()) ? auth()->user()->liked_group_posts->contains($gp->id) : false;
 
 		return view('group.view-post', compact('gp', 'likes', 'type'));
+	}
+
+	public function priv_report_show_notif(Group $group)
+	{
+		$priv_report_notif = Group::find($group->id)->notifications()->where('type', 'App\Notifications\report_post')->get();
+
+		// dd($priv_report_notif);
+
+		return view('group.priv-report-panel', compact('group', 'priv_report_notif'));
+	}
+
+	public function make_priv_report(GroupPosts $gp)
+	{
+		$sender = User::find(Auth::id());
+
+		$group = Group::find($gp->group_id);
+
+		$gp = GroupPosts::find($gp->id);
+
+		$group->notify(new report_post($sender, $group, $gp));
+
+		return redirect()->back()->with('success', 'Post is now reported and will be reviewed by the admins promptly.');
+	}
+
+	public function pub_report_show_notif(Group $group)
+	{
+		$pub_report_notif = Group::find($group->id)->notifications()->where('type', 'App\Notifications\report_pub_post')->get();
+
+		// dd($pub_report_notif);
+
+		return view('group.pub-report-panel', compact('group', 'pub_report_notif'));
+	}
+
+	public function make_pub_report(GroupPosts $gp)
+	{
+		$sender = User::find(Auth::id());
+
+		$group = Group::find($gp->group_id);
+
+		$gp = GroupPosts::find($gp->id);
+
+		$group->notify(new report_pub_post($sender, $group, $gp));
+
+		return redirect()->back()->with('success', 'Post is now reported and will be reviewed by the admins promptly.');
 	}
 
 }
