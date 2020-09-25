@@ -22,8 +22,10 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('follow-component', require('./components/follow/FollowComponent.vue').default);
-Vue.component('message-component', require('./components/message/MessageComponent.vue').default);
 Vue.component('like-component', require('./components/like/LikeComponent.vue').default);
+
+// chat app
+Vue.component('chat-app', require('./components/chats/ChatApp.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

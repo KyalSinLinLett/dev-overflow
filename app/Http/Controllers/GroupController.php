@@ -242,13 +242,17 @@ class GroupController extends Controller
 
 	public function mark_as_read($notif)
 	{
-		$noti = json_decode(json_encode(DB::table('notifications')->where('id', $notif)->get(['type', 'data'])), $assoc=true);
+		$noti = json_decode(json_encode(DB::table('notifications')->where('id', $notif)->get(['id', 'type', 'data'])), $assoc=true);
 		$data = json_decode($noti[0]['data'], $assoc=true);
 
 		switch ($noti[0]['type']) 
 		{
 			case 'App\Notifications\report_post':
 				Group::find($data['group'])->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\priv_group_invite_accepted':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
 				break;
 			
 			case 'App\Notifications\join_request_approved':
@@ -268,10 +272,6 @@ class GroupController extends Controller
 		$noti = json_decode(json_encode(DB::table('notifications')->where('id', $notif)->get(['type', 'data'])), $assoc=true);
 		$data = json_decode($noti[0]['data'], $assoc=true);
 
-		// $noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
-
-		// dd($noti);
-
 		switch($noti[0]['type'])
 		{
 			case 'App\Notifications\report_post':
@@ -280,6 +280,10 @@ class GroupController extends Controller
 
 			case 'App\Notifications\report_pub_post':
 				Group::find($data['group'])->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\priv_group_invite_accepted':
+				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 			
 			case 'App\Notifications\join_request_approved':

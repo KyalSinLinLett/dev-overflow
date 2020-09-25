@@ -18,6 +18,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
 </head>
 <body>
     <div id="app">
@@ -49,6 +50,9 @@
                                 </li>
                             @endif
                         @else
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('chats.home') }}">Chats</a>
+                            </li>
                             <?php $user = auth()->user(); ?>
                             <li class="nav-item dropdown"> 
                                 <!-- Dropdown -->

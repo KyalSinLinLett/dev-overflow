@@ -123,3 +123,10 @@ Route::post('/group/gp-comment/{gp}', 'CommentController@gp_comment_store')->nam
 Route::get('/group/gp-comment-edit/{gp_cmt}', 'CommentController@gp_comment_edit')->name('group.gp-comment-edit');
 Route::post('/group/gp-comment-update', 'CommentController@gp_comment_update')->name('group.gp-comment-update');
 Route::get('/group/gp-comment-delete/{gp_cmt}', 'CommentController@gp_comment_delete')->name('group.gp-comment-delete');
+
+// chat related routes
+Route::get('chats/home', 'ChatsController@home')->name('chats.home');
+Route::get('/chats/contacts', 'ChatsController@get');
+Route::get('/chats/conversation/{id}', 'ChatsController@getMessagesFor');
+Route::post('/chats/conversation/send', 'ChatsController@send');
+Route::get('/chats/download-file/{file}', 'ChatsController@file_download');
