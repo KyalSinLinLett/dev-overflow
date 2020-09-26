@@ -2255,7 +2255,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['id', 'follows'],
+  props: ['owner', 'follower', 'follows'],
   data: function data() {
     return {
       status: this.follows
@@ -2265,7 +2265,7 @@ __webpack_require__.r(__webpack_exports__);
     followUser: function followUser() {
       var _this = this;
 
-      axios.post('/follow/' + this.id).then(function (response) {
+      axios.post('/follow/' + this.owner + '/' + this.follower).then(function (response) {
         _this.status = !_this.status;
       })["catch"](function (errors) {
         if (errors.response.status == 401) {
@@ -2299,7 +2299,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['id', 'likes', 'type'],
+  props: ['pid', 'likes', 'type', 'user'],
   data: function data() {
     return {
       status: this.likes
@@ -2309,7 +2309,7 @@ __webpack_require__.r(__webpack_exports__);
     likePost: function likePost() {
       var _this = this;
 
-      axios.post('/like/' + this.id + '/' + this.type).then(function (response) {
+      axios.post('/like/' + this.pid + '/' + this.type + '/' + this.user).then(function (response) {
         _this.status = !_this.status;
       })["catch"](function (errors) {
         if (errors.response.status == 401) {
@@ -44929,7 +44929,7 @@ var render = function() {
             _vm.contact
               ? _vm.contact.name
               : "Select a contact to start a conversation"
-          )
+          ) + " "
         )
       ]),
       _vm._v(" "),
@@ -57501,18 +57501,6 @@ try {
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-/**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-// let token = document.head.querySelector('meta[name="csrf-token"]');
-// if (token) {
-//     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-// } else {
-//     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-// }
-
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

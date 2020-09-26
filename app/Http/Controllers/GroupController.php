@@ -235,7 +235,7 @@ class GroupController extends Controller
 
 		$pri_grp_inv_accp = Auth::user()->notifications()->where('type', "App\Notifications\priv_group_invite_accepted")->get();
 
-		$notifications = $join_request->merge($pub_inv)->merge($priv_inv)->merge($pri_grp_inv_accp);
+		$notifications = $join_request->merge($pub_inv)->merge($priv_inv)->merge($pri_grp_inv_accp)->sortByDesc('created_at');
 
 		return view('group.notifications', compact('notifications')); 
 	}
@@ -262,6 +262,18 @@ class GroupController extends Controller
 			case 'App\Notifications\report_pub_post':
 				Group::find($data['group'])->notifications()->where('id', $notif)->get()->markAsRead();
 				break;
+
+			case 'App\Notifications\group_post_liked':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\post_liked':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\followed_user':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
 		}
 		
 		return redirect()->back();
@@ -287,6 +299,18 @@ class GroupController extends Controller
 				break;
 			
 			case 'App\Notifications\join_request_approved':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\post_liked':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\group_post_liked':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\followed_user':
 				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 
@@ -424,7 +448,6 @@ class GroupController extends Controller
 	public function accept_invite($notif){
 
 		// once the invite is accepted, the notification is gone.
-
 		$noti = Auth::user()->notifications()->where('id', $notif)->get(['type', 'data']);
 
 		Group::find($noti[0]['data']['group'])->member()->attach(User::find($noti[0]['data']['recipient'])->profile);

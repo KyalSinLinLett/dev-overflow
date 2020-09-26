@@ -7,7 +7,7 @@
 <script>
     export default {
 
-        props: ['id', 'likes', 'type'],
+        props: ['pid', 'likes', 'type', 'user'],
 
         data: function (){
             return {
@@ -17,7 +17,7 @@
 
         methods: {
             likePost() {
-                axios.post('/like/' + this.id + '/' + this.type)
+                axios.post('/like/' + this.pid + '/' + this.type + '/' + this.user)
                     .then(response => {
                         this.status = !this.status;
                     })

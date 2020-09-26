@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\post_liked;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Profile;
@@ -82,5 +84,21 @@ class ProfileController extends Controller
     {
         $following = $user->following;
         return view('profile.followingList', compact('following'));
+    }
+
+    public function notifications()
+    {
+        $post_likes = Auth::user()->notifications()->where('type', "App\Notifications\post_liked")->get();
+
+        $group_post_likes = Auth::user()->notifications()->where('type', "App\Notifications\group_post_liked")->get();
+        
+        $follows = Auth::user()->notifications()->where('type', "App\Notifications\followed_user")->get();
+
+        $notifications = $post_likes->merge($group_post_likes)->merge($follows)->sortByDesc('created_at');
+
+        dd($notifications);
+
+        return view('profile.notifications', compact('notifications'));
+        
     }
 }

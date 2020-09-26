@@ -86,7 +86,7 @@
 
 			<div class="d-flex">
 
-				<like-component id="{{ $gp->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
+				<like-component pid="{{ $gp->id }}" user="{{ auth()->user()->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
 
 				<form action="{{ route('group.gp-comment', $gp) }}" method='POST'>
 					@csrf

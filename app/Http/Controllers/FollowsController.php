@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Notifications\followed_user;
 
 class FollowsController extends Controller
 {
@@ -12,8 +13,13 @@ class FollowsController extends Controller
     	$this->middleware('auth');
     }
 
-    public function store(User $user)
+    public function store(User $owner, User $follower)
     {
-    	return auth()->user()->following()->toggle($user->profile);
+    	if(!$owner->profile->followers->contains($follower))
+    	{
+    		$owner->notify(new followed_user($follower, $owner));
+    	}
+
+    	return auth()->user()->following()->toggle($owner->profile);
     }
 }

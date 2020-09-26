@@ -28,7 +28,7 @@
 			contacts: {
 				type: Array,
 				default: []
-			}
+			},	
 		}, 
 
 		methods: {

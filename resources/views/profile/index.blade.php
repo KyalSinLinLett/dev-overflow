@@ -51,7 +51,7 @@
                             <div class="col-10 offset-1">
                                 @if(Auth::id() != $user->id)
                                 <div class="d-flex"> 
-                                     <follow-component id="{{ $user->id }}" follows="{{ $follows }}"></follow-component>
+                                     <follow-component owner="{{ $user->id }}" follower="{{ auth()->user()->id }}" follows="{{ $follows }}"></follow-component>
                                 </div>
                                 @endif
                             </div>
@@ -195,7 +195,7 @@
 
                 <div class="row mt-3">
                     <div class="col">
-                        <like-component id="{{ $post->id }}" likes="{{ auth()->user()->liked_posts->contains($post->id) ?? false }}"></like-component>
+                        <like-component pid="{{ $post->id }}" user="{{ auth()->user()->id }}" likes="{{ auth()->user()->liked_posts->contains($post->id) ?? false }}" type="{{ 'post' }}"></like-component>                    
                     </div>
                 </div>
             </div>

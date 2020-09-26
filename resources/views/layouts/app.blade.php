@@ -50,8 +50,22 @@
                                 </li>
                             @endif
                         @else
+
+                            <?php
+                                $unreadIds = App\Message::select(\DB::raw('`from` as sender_id, count(`from`) as messages_count'))
+                                    ->where('to', auth()->id())
+                                    ->where('read', false)
+                                    ->groupBy('from')
+                                    ->get();
+                            ?>
+
+
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('chats.home') }}">Chats</a>
+                                <a class="nav-link" href="{{ route('chats.home') }}">Chats 
+                                    @if( $unreadIds->first()->messages_count ?? null)
+                                    <small class="text-light ml-1 px-2" style="background-color: red; border-radius: 50%;"></small>
+                                    @endif
+                                </a>
                             </li>
                             <?php $user = auth()->user(); ?>
                             <li class="nav-item dropdown"> 
@@ -79,6 +93,13 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile.show', $user) }}">My Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('profile.noti') }}">Notifications 
+                                    @if(Auth::user()->unreadNotifications()->where('type', "App\Notifications\post_liked")->get()->count() > 0)
+                                        <small class="text-light  ml-1 px-2" style="background-color: red; border-radius: 50%;">
+                                        </small>
+                                    @endif</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

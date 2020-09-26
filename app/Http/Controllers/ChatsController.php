@@ -130,4 +130,5 @@ class ChatsController extends Controller
     {
         return response()->download(storage_path('app/public/chats/' . $file));
     }
+
 }

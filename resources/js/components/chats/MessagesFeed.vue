@@ -28,7 +28,7 @@
 		    messages: {
 		        type: Array,
 		        required: true
-		    }
+		    },
 		},
 
 		methods: {

@@ -1,6 +1,6 @@
 <template>
 	<div class="conversation">
-		<h1>{{ contact ?  contact.name : 'Select a contact to start a conversation' }}</h1>
+		<h1>{{ contact ?  contact.name : 'Select a contact to start a conversation' }} </h1>
 		<MessagesFeed :contact="contact" :messages="messages"/>
 		<MessageComposer @send="sendMessage"/>
 	</div>
@@ -32,13 +32,13 @@
 					return;
 				}
 
-				formData.append('contact_id', this.contact.id)
+				formData.append('contact_id', this.contact.id);
 
 				axios.post('/chats/conversation/send', formData)
 					.then((response) => {
 						this.$emit('new', response.data);
 					});
-			}
+			},
 		}, 
 
 		components: {MessagesFeed, MessageComposer}

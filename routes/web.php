@@ -28,10 +28,10 @@ Route::post('/comment/update/{comment}', 'CommentController@update')->name('comm
 Route::get('/comment/delete/{comment}', 'CommentController@delete')->name('comment.delete');
 
 //follow related routes
-Route::post('/follow/{user}', 'FollowsController@store');
+Route::post('/follow/{owner}/{follower}', 'FollowsController@store');
 
 //like related routes
-Route::post('/like/{post}/{type}', 'LikeController@store');
+Route::post('/like/{pid}/{type}/{uid}', 'LikeController@store');
 
 
 //profile related routes
@@ -42,6 +42,7 @@ Route::get('/profile/likedposts/{user}', 'ProfileController@viewLikedPosts')->na
 Route::get('/profile/shared-posts/{user}', 'ProfileController@sharedPosts')->name('profile.sharedPosts');
 Route::get('/profile/following/{user}', 'ProfileController@followingList')->name('profile.followingList');
 Route::get('/profile/follower/{user}', 'ProfileController@followerList')->name('profile.followerList');
+Route::get('/profile/noti/show', 'ProfileController@notifications')->name('profile.noti');
 
 //post related routes
 Route::post('/post', 'PostController@store')->name('post.store');

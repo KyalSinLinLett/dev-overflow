@@ -7,7 +7,7 @@
 <script>
     export default {
         
-        props: ['id', 'follows'],
+        props: ['owner', 'follower', 'follows'],
 
         data: function (){
             return {
@@ -17,7 +17,7 @@
 
         methods: {
             followUser() {
-                axios.post('/follow/' + this.id)
+                axios.post('/follow/' + this.owner + '/' + this.follower)
                     .then(response => {
                         this.status = !this.status;
                     })

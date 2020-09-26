@@ -69,7 +69,7 @@
                         single.unread += 1;
                     return single;
                 })
-            }
+            }, 
         },
 
         components: {Conversation, ContactsList}

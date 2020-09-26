@@ -59,7 +59,7 @@
 
     <div class="row mt-3">
         <div class="col">
-            <like-component id="{{ $post->id }}" likes="{{ auth()->user()->liked_posts->contains($post->id) ?? false }}"></like-component>
+            <like-component pid="{{ $post->id }}" user="{{ auth()->user()->id }}" likes="{{ auth()->user()->liked_posts->contains($post->id) ?? false }}" type="{{ 'post' }}"></like-component>
         </div>
     </div>
 </div>
