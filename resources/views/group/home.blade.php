@@ -84,7 +84,7 @@
 	                    </div> 
 	                </div>
 	            </div>
-		@if(!$group->privacy || $group->admin->contains(Auth::user()->profile) || $group->member->contains(Auth::user()->profile))
+		@if($group->admin->contains(Auth::user()->profile) || $group->member->contains(Auth::user()->profile))
             <div class="card" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
             	<div class="card-header bg-dark text-light" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
             		<h3 class="mt-2">Share something to the group</h3>
@@ -196,7 +196,7 @@
             
 	    @else
 	    	<div>
-	    		This is a private group. You must be invited by the admins to become a member.
+	    		You must be invited by the admins(if private) or join this group to become a member.
 	    	</div>
 	    @endif
 	        </div>

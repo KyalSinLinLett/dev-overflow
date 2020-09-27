@@ -1,4 +1,4 @@
-	@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <!-- use ajax in the future to make it async -->

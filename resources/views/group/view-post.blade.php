@@ -88,7 +88,7 @@
 
 				<like-component pid="{{ $gp->id }}" user="{{ auth()->user()->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
 
-				<form action="{{ route('group.gp-comment', $gp) }}" method='POST'>
+				<form action="{{ route('group.gp-comment', [$gp, auth()->user()->id]) }}" method='POST'>
 					@csrf
 					<div class="form-group">
 						<input type="text" name="comment" placeholder="Comment..." required>

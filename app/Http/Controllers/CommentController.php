@@ -8,7 +8,10 @@ use App\Post;
 use App\User;
 use App\Comment;
 use App\GroupPosts;
+use App\Group;
 use App\GPComment;
+use App\Notifications\commented;
+use App\Notifications\group_post_commented;
 
 class CommentController extends Controller
 {
@@ -19,13 +22,20 @@ class CommentController extends Controller
 
     ////// NORMAL POSTS ////////
 
-    public function store(Request $request, Post $post)
+    public function store(Request $request, Post $post, User $user)
     {
   		$data = $request->validate([
   			'comment' => 'required|max:255',
   		]);
 
   		$post->comments()->create(array_merge($data, ['user_id' => auth()->user()->id]));
+
+        $post_owner = User::find($post->user_id);
+        $commentor = auth()->user();
+
+        if($post_owner != $commentor){
+            $post_owner->notify(new commented($commentor, $post, $post_owner));
+        }
 
   		return redirect(route('post.show', $post));
     }
@@ -59,7 +69,7 @@ class CommentController extends Controller
 
     ////// GROUP POSTS /////////
     
-    public function gp_comment_store(Request $request, GroupPosts $gp)
+    public function gp_comment_store(Request $request, GroupPosts $gp, User $user)
     {   
         $data = $request->validate([
             'comment' => 'required|max:255',
@@ -70,6 +80,16 @@ class CommentController extends Controller
         try {
 
             $gp->gp_comments()->create($gp_comment_data);
+
+            $commentor = auth()->user();
+            $gp_owner = User::find($gp->user_id);
+            $group = Group::find($gp->group_id);
+
+            if($commentor != $gp_owner)
+            {
+                User::find($gp->user_id)->notify(new group_post_commented($commentor, $gp, $gp_owner, $group));
+            }
+
             return redirect()->back()->with('success', 'Comment is posted.');
 
         } catch (Exception $e) {

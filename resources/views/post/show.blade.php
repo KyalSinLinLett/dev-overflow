@@ -82,7 +82,8 @@
 
 	    <div class="row">
 	    	<div class="col">
-	    		<form action="{{ route('comment', $post) }}" method="POST">
+	    		<?php $user = auth()->user()->id ;?>
+	    		<form action="{{ route('comment', [$post, $user]) }}" method="POST">
 	    			@csrf
     				<div class="mt-2 mb-3">
     					<div class="row">
@@ -115,7 +116,8 @@
 	    		<like-component pid="{{ $post->id }}" user="{{ auth()->user()->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
 
 	    		@if(!auth()->user()->shared_posts->contains($post))
-	    			<a href="{{ route('post.share', $post) }}">Share post</a>
+	    			<?php $user = auth()->user(); ?>
+	    			<a href="{{ route('post.share', [$post, $user]) }}">Share post</a>
 	    		@endif
 	    	</div>
 	    </div>

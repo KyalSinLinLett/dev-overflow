@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Profile;
 use App\User;
+use App\Group;
 
 class ProfileController extends Controller
 {
@@ -88,17 +89,46 @@ class ProfileController extends Controller
 
     public function notifications()
     {
-        $post_likes = Auth::user()->notifications()->where('type', "App\Notifications\post_liked")->get();
+        $post_likes = Auth::user()->notifications->where('type', "App\Notifications\post_liked");
 
-        $group_post_likes = Auth::user()->notifications()->where('type', "App\Notifications\group_post_liked")->get();
+        $group_post_likes = Auth::user()->notifications->where('type', "App\Notifications\group_post_liked");
         
-        $follows = Auth::user()->notifications()->where('type', "App\Notifications\followed_user")->get();
+        $follows = auth()->user()->notifications->where('type', 'App\Notifications\followed_user');
 
-        $notifications = $post_likes->merge($group_post_likes)->merge($follows)->sortByDesc('created_at');
+        $comments = auth()->user()->notifications->where('type', 'App\Notifications\commented');
 
-        dd($notifications);
+        $gpcomments = auth()->user()->notifications->where('type', 'App\Notifications\group_post_commented');
+
+        $shares = auth()->user()->notifications->where('type', 'App\Notifications\shared_post');
+
+        $notifications = $post_likes->merge($group_post_likes)->merge($follows)->merge($comments)->merge($gpcomments)->merge($shares)->sortByDesc('created_at');
+
+        // dd($notifications);
 
         return view('profile.notifications', compact('notifications'));
         
     }
+
+    public function feed_search(Request $request)
+    {
+        if($request->search_query != '')
+        {
+            $users = User::where('name', 'like', '%' . $request->search_query . '%')->skip(0)->take(8)->get();
+
+            $users = $users->map(function($user) {
+
+                $user->image = $user->profile->profileImage();
+
+                $user->biography = $user->profile->biography;
+
+                return $user;
+
+            });
+
+            return response()->json($users);
+        }
+    
+        return response()->json(['message' => 'No search results']);
+    }
+
 }

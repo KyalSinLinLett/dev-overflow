@@ -6,6 +6,7 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use App\Post;
 use App\User;
+use App\Notifications\shared_post;
 
 class PostController extends Controller
 {
@@ -99,9 +100,17 @@ class PostController extends Controller
       return redirect(route('profile.show', $user));
     }
 
-    public function sharePost(Request $request, Post $post)
+    public function sharePost(Request $request, Post $post, User $user)
     {
       auth()->user()->shared_posts()->attach($post);
+
+      $post_owner = User::find($post->user_id);
+      $sharer = auth()->user();
+
+      if($post_owner != $sharer)
+      {
+        $post_owner->notify(new shared_post($post, $post_owner, $sharer));
+      }
 
       return redirect()->back()->with(['message'=>"Post is added to your shared posts collection."]);
     }

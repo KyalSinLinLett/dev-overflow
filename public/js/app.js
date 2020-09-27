@@ -58265,6 +58265,85 @@ __webpack_require__.r(__webpack_exports__);
       location.reload();
     });
   }); // post search admin panel //
+  // feed search admin panel //
+
+  $(document).ready(function () {
+    $("#clearbtn5").hide();
+  });
+  $('body').on('keyup', '#search-feed', function () {
+    var search_query = $(this).val();
+    $(document).ready(function () {
+      $("#clearbtn5").show();
+    }); // console.log(search_query);
+
+    $.ajax({
+      method: 'get',
+      url: '/feed/search',
+      dataType: 'json',
+      data: {
+        '_token': '{{ csrf_token() }}',
+        search_query: search_query
+      },
+      success: function success(res) {
+        // console.log(res);
+        if (res.message != 'No search results') {
+          var tableRow = '';
+          $('#dyn-feed').html('');
+          $.each(res, function (index, value) {
+            tableRow = '<tr><td><a href="/profile/' + value.id + '"><img src="' + value.image + '" width="50" height="50"></a></td><td><a href="/profile/' + value.id + '">' + value.name + '</a></td><td><strong>' + value.biography + '</strong></td></tr>';
+            $('#dyn-feed').append(tableRow);
+          });
+        } else {
+          $('#dyn-feed').html('');
+        }
+      }
+    });
+  });
+  $(document).ready(function () {
+    $("#clearbtn5").click(function () {
+      location.reload();
+    });
+  }); // feed search admin panel //
+  // feed search admin panel //
+
+  $(document).ready(function () {
+    $("#clearbtn6").hide();
+  });
+  $('body').on('keyup', '#search-group', function () {
+    var search_query = $(this).val();
+    $(document).ready(function () {
+      $("#clearbtn6").show();
+    });
+    console.log(search_query);
+    $.ajax({
+      method: 'get',
+      url: '/group/search',
+      dataType: 'json',
+      data: {
+        '_token': '{{ csrf_token() }}',
+        search_query: search_query
+      },
+      success: function success(res) {
+        console.log(res);
+
+        if (res.message != 'No search results') {
+          var tableRow = '';
+          $('#dyn-grp-search').html('');
+          $.each(res, function (index, value) {
+            tableRow = '<tr><td><a href="/group/home/' + value.id + '"><img src="' + value.image + '" width="50" height="50"></a></td><td><a href="/group/home/' + value.id + '">' + value.name + '</a></td><td><strong>' + value.description + '</strong></td></tr>';
+            $('#dyn-grp-search').append(tableRow);
+          });
+        } else {
+          $('#dyn-grp-search').html('');
+        }
+      }
+    });
+  });
+  $(document).ready(function () {
+    $("#clearbtn6").click(function () {
+      location.reload();
+    });
+  }); // feed search admin panel //
 }
 
 /***/ }),

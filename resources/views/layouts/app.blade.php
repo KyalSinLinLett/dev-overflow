@@ -96,7 +96,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile.noti') }}">Notifications 
-                                    @if(Auth::user()->unreadNotifications()->where('type', "App\Notifications\post_liked")->get()->count() > 0)
+                                    @if(Auth::user()->unreadNotifications()->where('type', "App\Notifications\post_liked")->get()->count() > 0 || Auth::user()->unreadNotifications->where('type', "App\Notifications\followed_user")->count() > 0 || Auth::user()->unreadNotifications()->where('type', "App\Notifications\commented")->get()->count() > 0|| Auth::user()->unreadNotifications()->where('type', "App\Notifications\group_post_commented")->get()->count() > 0)
                                         <small class="text-light  ml-1 px-2" style="background-color: red; border-radius: 50%;">
                                         </small>
                                     @endif</a>

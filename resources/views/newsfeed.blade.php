@@ -2,6 +2,18 @@
 	<h1>Public feed</h1>
 </div>
 <hr>
+
+<div class="d-flex">
+    <input type="text" id="search-feed" class="form-control" placeholder="look for users to follow..">
+    <button class="btn btn-warning" id="clearbtn5">Clear</button>
+</div>
+
+<table class="table">
+    <tbody id="dyn-feed">
+
+    </tbody>
+</table>
+
 @forelse($posts as $post)
 <div class="card p-4 mb-3"style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 

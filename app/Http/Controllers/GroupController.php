@@ -274,6 +274,18 @@ class GroupController extends Controller
 			case 'App\Notifications\followed_user':
 				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
 				break;
+
+			case 'App\Notifications\commented':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\group_post_commented':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
+
+			case 'App\Notifications\shared_post':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
 		}
 		
 		return redirect()->back();
@@ -306,11 +318,23 @@ class GroupController extends Controller
 				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 
+			case 'App\Notifications\commented':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
 			case 'App\Notifications\group_post_liked':
 				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 
 			case 'App\Notifications\followed_user':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\shared_post':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\group_post_commented':
 				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 
@@ -833,6 +857,26 @@ class GroupController extends Controller
 		$group->notify(new report_pub_post($sender, $group, $gp));
 
 		return redirect()->back()->with('success', 'Post is now reported and will be reviewed by the admins promptly.');
+	}
+
+	public function group_search(Request $request)
+	{
+		if($request->search_query != '')
+		{
+		    $groups = Group::where('name', 'like', '%' . $request->search_query . '%')->skip(0)->take(8)->get();
+
+		    $groups = $groups->map(function($group) {
+
+		        $group->image = $group->groupImage();
+
+		        return $group;
+
+		    });
+
+		    return response()->json($groups);
+		}
+		
+		return response()->json(['message' => 'No search results']);
 	}
 
 }

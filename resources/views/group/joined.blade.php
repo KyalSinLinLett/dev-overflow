@@ -5,6 +5,19 @@
 	<div>
 		<h3>Groups I've joined</h3>
 		<hr>
+
+		<div class="d-flex">
+		    <input type="text" id="search-group" class="form-control" placeholder="look for groups to join..">
+		    <button class="btn btn-warning" id="clearbtn6">Clear</button>
+		</div>
+
+		<table class="table">
+		    <tbody id="dyn-grp-search">
+
+		    </tbody>
+		</table>
+
+
 		@forelse($groups as $group)
 			<div class="card">
 				<div class="card-header">

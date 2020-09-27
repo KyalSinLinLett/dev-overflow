@@ -22,7 +22,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 //comment related routes
-Route::post('/comment/{post}', 'CommentController@store')->name('comment');
+Route::post('/comment/{post}/{user}', 'CommentController@store')->name('comment');
 Route::get('/comment/{comment}/edit', 'CommentController@edit')->name('comment.edit');
 Route::post('/comment/update/{comment}', 'CommentController@update')->name('comment.update');
 Route::get('/comment/delete/{comment}', 'CommentController@delete')->name('comment.delete');
@@ -44,6 +44,10 @@ Route::get('/profile/following/{user}', 'ProfileController@followingList')->name
 Route::get('/profile/follower/{user}', 'ProfileController@followerList')->name('profile.followerList');
 Route::get('/profile/noti/show', 'ProfileController@notifications')->name('profile.noti');
 
+// searches routes
+Route::get('/feed/search/', 'ProfileController@feed_search')->name('feed.search');
+Route::get('/group/search/', 'GroupController@group_search')->name('group.search');
+
 //post related routes
 Route::post('/post', 'PostController@store')->name('post.store');
 Route::get('/post/{post}', 'PostController@show')->name('post.show');
@@ -53,7 +57,7 @@ Route::get('/post/{post}/delete', 'PostController@delete')->name('post.delete');
 Route::get('/my-circle', 'PostController@privateFeed')->name('post.privatefeed');
 
 //sharing posts related
-Route::get('/post/{post}/share', 'PostController@sharePost')->name('post.share');
+Route::get('/post/{post}/{user}/share', 'PostController@sharePost')->name('post.share');
 Route::get('/post/{post}/share-remove', 'PostController@shareRemove')->name('post.shareremove');
 
 //group related routes
@@ -120,7 +124,7 @@ Route::get('/group/group-post/delete/{gp}', 'GroupController@delete_post')->name
 Route::get('/group/view-post/{gp}', 'GroupController@view_post')->name('group.view-post');
 
 // -> group post comments
-Route::post('/group/gp-comment/{gp}', 'CommentController@gp_comment_store')->name('group.gp-comment');
+Route::post('/group/gp-comment/{gp}/{user}', 'CommentController@gp_comment_store')->name('group.gp-comment');
 Route::get('/group/gp-comment-edit/{gp_cmt}', 'CommentController@gp_comment_edit')->name('group.gp-comment-edit');
 Route::post('/group/gp-comment-update', 'CommentController@gp_comment_update')->name('group.gp-comment-update');
 Route::get('/group/gp-comment-delete/{gp_cmt}', 'CommentController@gp_comment_delete')->name('group.gp-comment-delete');
