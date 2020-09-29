@@ -169,7 +169,7 @@
     @endcan
 
     <div class="mt-4">
-        <h3>Your posts</h3>
+        <h3>Posts</h3>
     </div>
     <hr>
 

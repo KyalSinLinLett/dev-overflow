@@ -84,7 +84,7 @@
 			@endforeach
 			@endif
 
-			<div>
+			<div class="mt-3">
 				<div>
 					<form action="{{ route('group.gp-comment', [$gp, auth()->user()->id]) }}" method='POST'>
 						@csrf
