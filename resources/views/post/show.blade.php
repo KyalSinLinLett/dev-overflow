@@ -117,7 +117,7 @@
 
 	    		@if(!auth()->user()->shared_posts->contains($post))
 	    			<?php $user = auth()->user(); ?>
-	    			<a href="{{ route('post.share', [$post, $user]) }}">Share post</a>
+	    			<a class="btn btn-outline-primary btn-block" href="{{ route('post.share', [$post, $user]) }}">Save post</a>
 	    		@endif
 	    	</div>
 	    </div>
@@ -128,30 +128,25 @@
 	</div>
 	<hr>
 
-	<div class="row">
+	<div class="row mb-4">
 		<div class="col">
 			<?php use App\User;?>
 			@foreach($post->comments as $comment)
 			<div class="card p-3 mb-2"style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 				<?php $user = User::find($comment->user_id); ?>
-				<div class="row">
-					<div class="col-1">
-						<img src="{{ $user->profile->profileImage() }}" class="rounded-circle" width="50" height="50">
+				<div class="d-flex align-items-center justify-content-between">
+					<div>
+						<img src="{{ $user->profile->profileImage() }}" class="rounded-circle mr-2" width="50" height="50">
+						<i>{{ $comment->comment }}</i>
 					</div>
-					<div class="col-10">
-						<div class="row justify-content-between">
-							<a href="{{ route('profile.show' , $user) }}"><strong>{{ $user->name }}</strong> </a>
-							@can('update', $user->profile)
-							<div>
-								<a href="{{ route('comment.edit', $comment)}}">Edit</a>
-								<a href="{{ route('comment.delete', $comment) }}">Delete</a>
-							</div>
-							@endcan
-						</div>
 
-						<div class="row">
-							<i>{{ $comment->comment }}</i>
+					<div>
+						@can('update', $user->profile)
+						<div>
+							<a href="{{ route('comment.edit', $comment)}}">Edit</a>
+							<a href="{{ route('comment.delete', $comment) }}">Delete</a>
 						</div>
+						@endcan
 					</div>
 				</div>
 			</div>

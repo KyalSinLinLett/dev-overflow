@@ -22,7 +22,7 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'd3v-overfl0w') }}
@@ -50,23 +50,6 @@
                                 </li>
                             @endif
                         @else
-
-                            <?php
-                                $unreadIds = App\Message::select(\DB::raw('`from` as sender_id, count(`from`) as messages_count'))
-                                    ->where('to', auth()->id())
-                                    ->where('read', false)
-                                    ->groupBy('from')
-                                    ->get();
-                            ?>
-
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('chats.home') }}">Chats 
-                                    @if( $unreadIds->first()->messages_count ?? null)
-                                    <small class="text-light ml-1 px-2" style="background-color: red; border-radius: 50%;"></small>
-                                    @endif
-                                </a>
-                            </li>
                             <?php $user = auth()->user(); ?>
                             <li class="nav-item dropdown"> 
                                 <!-- Dropdown -->
@@ -88,25 +71,31 @@
                                   </div>
                                 </li>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('post.privatefeed') }}">My Circle</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.show', $user) }}">My Profile</a>
-                            </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile.noti') }}">Notifications 
-                                    @if(Auth::user()->unreadNotifications()->where('type', "App\Notifications\post_liked")->get()->count() > 0 || Auth::user()->unreadNotifications->where('type', "App\Notifications\followed_user")->count() > 0 || Auth::user()->unreadNotifications()->where('type', "App\Notifications\commented")->get()->count() > 0|| Auth::user()->unreadNotifications()->where('type', "App\Notifications\group_post_commented")->get()->count() > 0)
+                                    @if(Auth::user()->unreadNotifications()->where('type', "App\Notifications\post_liked")->get()->count() > 0 || Auth::user()->unreadNotifications()->where('type', "App\Notifications\followed_user")->get()->count() > 0 || Auth::user()->unreadNotifications()->where('type', "App\Notifications\commented")->get()->count() > 0|| Auth::user()->unreadNotifications()->where('type', "App\Notifications\group_post_commented")->get()->count() > 0)
                                         <small class="text-light  ml-1 px-2" style="background-color: red; border-radius: 50%;">
                                         </small>
                                     @endif</a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('chats.home') }}">Chats
+                                </a>
+                            </li>
+                            
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+
+                                    <a class="dropdown-item" href="{{ route('post.privatefeed') }}">My Circle</a>
+                                    
+                                    <a class="dropdown-item" href="{{ route('profile.show', $user) }}">My Profile</a>
+
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

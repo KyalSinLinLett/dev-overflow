@@ -84,29 +84,33 @@
 			@endforeach
 			@endif
 
-			<div class="d-flex">
+			<div>
+				<div>
+					<form action="{{ route('group.gp-comment', [$gp, auth()->user()->id]) }}" method='POST'>
+						@csrf
+						<div>
+							<input type="text" name="comment" class="form-control" placeholder="Comment..." required>
+						</div>
+						<button type="submit" class="btn btn-warning mt-2">Comment</button>
+					</form>					
+				</div>
 
-				<like-component pid="{{ $gp->id }}" user="{{ auth()->user()->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
-
-				<form action="{{ route('group.gp-comment', [$gp, auth()->user()->id]) }}" method='POST'>
-					@csrf
-					<div class="form-group">
-						<input type="text" name="comment" placeholder="Comment..." required>
-						<button type="submit" class="btn btn-warning">Comment</button>
-					</div>
-				</form>
-
+				<div class="my-3">
+					<like-component pid="{{ $gp->id }}" user="{{ auth()->user()->id }}" likes="{{ $likes }}" type="{{ $type }}"></like-component>
+				</div>
 			</div>
+					
     	</div>
    	</div>
 
 	@forelse($gp->gp_comments as $gp_cmt)
 		<div class="card px-3 py-3 mb-3" style="border-radius: 1.5rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
 			<div class="d-flex align-items-center justify-content-between">
-				<div>
+				<div class="d-flex">
 					<a href="{{ route('profile.show', $gp_cmt->user_id) }}"><img class="mr-3" src="{{ App\User::find($gp_cmt->user_id)->profile->profileImage() }}" width="50" height="50" style="border-radius: 50%;"></a>
-					<a href="{{ route('profile.show', $gp_cmt->user_id) }}">{{ App\User::find($gp_cmt->user_id)->name }}</a> - 
-					{{ $gp_cmt->comment }}
+					<div>
+						{{ $gp_cmt->comment }}
+					</div>
 				</div>
 				
 				<div>
@@ -117,8 +121,7 @@
 
 					<small>{{ $gp_cmt->created_at->diffForHumans() }}</small>
 				</div>
-			</div>
-			
+			</div>	
 		</div>
 	@empty
 	@endforelse

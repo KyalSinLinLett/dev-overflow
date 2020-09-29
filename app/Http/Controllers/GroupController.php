@@ -79,7 +79,7 @@ class GroupController extends Controller
         {
             $imagePath = $request->groupPhoto->store('group', 'public');
 
-            $image = Image::make(public_path("storage/{$imagePath}"))->fit(1000, 1000);
+            $image = Image::make("storage/{$imagePath}")->fit(1000, 1000);
 
             $image->save();
 
@@ -254,6 +254,10 @@ class GroupController extends Controller
 			case 'App\Notifications\priv_group_invite_accepted':
 				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
 				break;
+
+			case 'App\Notifications\send_pub_invite_noti':
+				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
+				break;
 			
 			case 'App\Notifications\join_request_approved':
 				Auth::user()->notifications()->where('id', $notif)->get()->markAsRead();
@@ -307,6 +311,10 @@ class GroupController extends Controller
 				break;
 
 			case 'App\Notifications\priv_group_invite_accepted':
+				Auth::user()->notifications()->where('id', $notif)->delete();
+				break;
+
+			case 'App\Notifications\send_pub_invite_noti':
 				Auth::user()->notifications()->where('id', $notif)->delete();
 				break;
 			
@@ -515,7 +523,7 @@ class GroupController extends Controller
 	        		{
 	    			    $imagePath = $file->store('group/group_posts', 'public');
 
-	    			    $image = Image::make(public_path("storage/{$imagePath}"))->fit(800, 800);
+	    			    $image = Image::make("storage/{$imagePath}")->fit(800, 800);
 
 	    			    $image->save();
 
@@ -700,7 +708,7 @@ class GroupController extends Controller
 	        		{
 	    			    $imagePath = $file->store('group/group_posts', 'public');
 
-	    			    $image = Image::make(public_path("storage/{$imagePath}"))->fit(800, 800);
+	    			    $image = Image::make("storage/{$imagePath}")->fit(800, 800);
 
 	    			    $image->save();
 

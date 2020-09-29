@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Post;
 use App\User;
@@ -12,51 +13,51 @@ class PostController extends Controller
 {
     public function __construct()
     {
-    	$this->middleware('auth');
+      $this->middleware('auth');
     }
 
-   	// public function index()
-   	// {
-   	// 	// $users = auth()->user()->following()->pluck('profiles.user_id');
-   	// 	// $posts = Post::whereIn('user_id', $users)->with('user')->latest();
+    // public function index()
+    // {
+    //  // $users = auth()->user()->following()->pluck('profiles.user_id');
+    //  // $posts = Post::whereIn('user_id', $users)->with('user')->latest();
 
-   	// 	// return redirect(route('post.index', $posts));
-   	// }
+    //  // return redirect(route('post.index', $posts));
+    // }
 
-   	public function store(Request $request)
-   	{
-   		$data = $request->validate([
-   			'title' => 'required',
-   			'content' => 'required',
-   			'postimage' => '',
-   		]);
+    public function store(Request $request)
+    {
+      $data = $request->validate([
+        'title' => 'required',
+        'content' => 'required',
+        'postimage' => '',
+      ]);
 
-   		if ($request->postimage)
-   		{
-   			$imagePath = $request->postimage->store('post', 'public');
+      if ($request->postimage)
+      {
+        $imagePath = $request->postimage->store('post', 'public');
 
-   			$image = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 1200);
+        $image = Image::make("storage/{$imagePath}")->fit(1200, 1200);
 
-   			$image->save();
+        $image->save();
 
-   			$imgArr = ['postimage' => $imagePath];
-   		}
+        $imgArr = ['postimage' => $imagePath];
+      }
 
-   		auth()->user()->posts()->create(array_merge($data, $imgArr ?? []));
+      auth()->user()->posts()->create(array_merge($data, $imgArr ?? []));
 
       $user = auth()->user();
 
-   		return redirect(route('profile.show', $user));
-   	}
+      return redirect(route('profile.show', $user));
+    }
 
-   	public function show(Post $post)
-   	{
+    public function show(Post $post)
+    {
       $type = "post";
 
       $likes = (auth()->user()) ? auth()->user()->liked_posts->contains($post->id) : false;
 
-   		return view('post.show', compact('post', 'likes', 'type'));
-   	}
+      return view('post.show', compact('post', 'likes', 'type'));
+    }
 
     public function feed(){
       $posts = Post::latest()->get();
@@ -80,11 +81,13 @@ class PostController extends Controller
       {
         $imagePath = $request->postimage->store('post', 'public');
 
-        $image = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 1200);
+        $image = Image::make("storage/{$imagePath}")->fit(1200, 1200);
 
         $image->save();
 
         $imgArr = ['postimage' => $imagePath];
+        
+        Storage::delete($post->image);
       }
 
       Post::find($post->id)->update(array_merge($data, $imgArr ?? []));
@@ -94,6 +97,7 @@ class PostController extends Controller
 
     public function delete(Post $post)
     {
+      Storage::delete($post->image);
       $post->delete();
       $user = $post->user;
       // return view('profile.index', compact('user'));

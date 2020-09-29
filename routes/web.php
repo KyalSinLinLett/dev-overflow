@@ -28,7 +28,7 @@ Route::post('/comment/update/{comment}', 'CommentController@update')->name('comm
 Route::get('/comment/delete/{comment}', 'CommentController@delete')->name('comment.delete');
 
 //follow related routes
-Route::post('/follow/{owner}/{follower}', 'FollowsController@store');
+Route::get('/follow/{owner}/{follower}', 'FollowsController@store')->name('follow');
 
 //like related routes
 Route::post('/like/{pid}/{type}/{uid}', 'LikeController@store');

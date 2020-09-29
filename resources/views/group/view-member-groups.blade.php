@@ -15,14 +15,29 @@
 		</li>
 	</ul>
 	<br>
+
 	@forelse($p_member as $g_member)	
-		<div class="card">
-			<div class="card-header d-flex">
-				<img src="{{ $g_member->groupImage() }}" width="35" height="35">
-				<p>Group: <a href="{{ route('group.home', $g_member)}}">{{ $g_member->name }}</a></p>
+		<div class="card" style="border-radius: 2rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+			<div class="card-header bg-dark d-flex align-items-center" style="border-radius: 2rem; box-shadow: 7px 7px 15px -10px rgba(0,0,0,0.48);">
+				<a href="{{ route('group.home', $g_member)}}"><img src="{{ $g_member->groupImage() }}" width="50" height="50" style="border-radius: 50%"></a>
+				<p class="ml-3 mt-3"><strong class="text-light">Group: <a class="text-light" href="{{ route('group.home', $g_member)}}">{{ $g_member->name }}</a></strong>
+				</p>
 			</div>
 			<div class="card-body">
+				<p>Category: {{ $g_member->category }}</p>
+				<p>Privacy: 
+					@if($g_member->privacy)
+						Private
+					@else
+						Public
+					@endif
+				</p>
 				<p>Description: {{ $g_member->description }}</p>
+				<small>Admins: 
+					@foreach($g_member->admin as $admin)
+					{{ App\User::find($admin->user_id)->name }} | 
+					@endforeach
+				</small>
 			</div>
 		</div>
 		<br>

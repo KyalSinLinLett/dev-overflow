@@ -20,6 +20,8 @@ class FollowsController extends Controller
     		$owner->notify(new followed_user($follower, $owner));
     	}
 
-    	return auth()->user()->following()->toggle($owner->profile);
+        auth()->user()->following()->toggle($owner->profile);
+
+    	return redirect()->back();
     }
 }

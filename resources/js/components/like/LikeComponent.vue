@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <button class="btn btn-outline-info btn-block" @click="likePost" v-text="buttonText"></button>
+        <button class="btn btn-outline-success btn-block" @click="likePost" v-text="buttonText"></button>
     </div>
 </template>
 

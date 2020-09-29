@@ -104,7 +104,7 @@ class ChatsController extends Controller
                 {
                     $path = $request->image->store('chats', 'public');
 
-                    $image = Image::make(public_path("storage/{$path}"))->fit(700,700);
+                    $image = Image::make("storage/{$path}")->fit(700,700);
 
                     $image->save();
 
