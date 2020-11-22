@@ -12,13 +12,13 @@ Now, follow these 11 easy steps to have the project running on your local machin
 ### Step 1:
 Clone this repository onto your local machine.
 ```bash
-git clone https://github.com/KyalSinLinLett/green-thumbs.git
+git clone https://github.com/KyalSinLinLett/dev-overflow.git
 ```
 
 ### Step 2:
 **cd** into your project
 ```bash
-cd green-thumbs
+cd dev-overflow
 ```
 
 ### Step 3:
