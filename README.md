@@ -1,61 +1,67 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+# Laravel+Vue based social network. (Dev-Overflow)
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Pusher
+You will also need to set up a [Pusher](https://pusher.com/) account and create your own project to get the APP credentials to fill in the .env file so that the notifications and the chat feature works.
 
-## About Laravel
+## Installation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Firstly, you need to have [composer](https://getcomposer.org/download/), [PHP](https://www.apachefriends.org/download.html) and [npm](https://nodejs.org/en/download/) to work with this project.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Now, follow these 11 easy steps to have the project running on your local machine.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Step 1:
+Clone this repository onto your local machine.
+```bash
+git clone https://github.com/KyalSinLinLett/green-thumbs.git
+```
 
-## Learning Laravel
+### Step 2:
+**cd** into your project
+```bash
+cd green-thumbs
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Step 3:
+Install composer dependencies
+```bash
+composer install
+```
+### Step 4:
+Install npm dependencies
+```bash
+npm install
+```
+### Step 5:
+Make a copy of the *.env.example* file and name it *.env*. You can now open this project with your preferred text editor to fill out the configuration details such as database and APP_KEY value.
+```bash
+cp .env.example .env
+```
+### Step 6:
+You now have to generate an APP_KEY that will be automatically filled in, in your *.env* file.
+```bash
+php artisan key:generate
+```
+### Step 7:
+Our web application requires a database. Create an empty database for your project using the database tool you prefer. If you had installed [XAMPP](https://www.apachefriends.org/download.html), then you could use **phpmyadmin** to set up your database.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Step 8:
+In the .env file, fill the DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, and DB_PASSWORD options to match the credentials of the database you just created.
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
+### Step 9:
+Now you can run migrations and the tables will be generated for you.
+```bash
+php artisan migrate
+```
+### Step 10:
+Create a symlink to link the files under storage with public.
+```bash
+php artisan storage:link
+```
+### Step 11:
+The project is ready to be served on your local machine.
+```bash
+php artisan serve
+npm run watch
+```
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[MIT](https://choosealicense.com/licenses/mit/)
